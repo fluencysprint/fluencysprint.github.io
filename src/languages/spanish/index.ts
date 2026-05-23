@@ -4,6 +4,7 @@ import { readingTexts as legacySpanishReadings } from '../../data/readingTexts';
 import { writingPrompts as legacySpanishWritingPrompts } from '../../data/prompts';
 import { spanishA1Exercises, spanishA2Exercises, spanishA1A2Readings, spanishA1A2WritingPrompts } from './a1a2';
 import { spanishExtraExercises, spanishExtraReadings, spanishExtraWritingPrompts } from './extra';
+import { spanishCalibratedExercises, spanishCalibratedReadings, spanishCalibratedWritingPrompts } from './calibrated';
 import { spanishMetadata } from './metadata';
 
 export interface LanguagePack {
@@ -17,18 +18,21 @@ const allExercises: Exercise[] = [
   ...spanishA1Exercises,
   ...spanishA2Exercises,
   ...spanishExtraExercises,
+  ...spanishCalibratedExercises,
   ...legacySpanishExercises,
 ];
 
 const allReadings: ReadingText[] = [
   ...spanishA1A2Readings,
   ...spanishExtraReadings,
+  ...spanishCalibratedReadings,
   ...legacySpanishReadings,
 ];
 
 const allWritingPrompts: WritingPromptMeta[] = [
   ...spanishA1A2WritingPrompts,
   ...spanishExtraWritingPrompts,
+  ...spanishCalibratedWritingPrompts,
   ...legacySpanishWritingPrompts,
 ];
 

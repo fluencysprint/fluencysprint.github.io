@@ -7,67 +7,32 @@ import {
   getRecentExerciseIds, markExercisesSeen,
 } from '../lib/storage';
 import { recordMistake, recordCorrectReview } from '../lib/scheduler';
+import { recordEvidence } from '../lib/evidence';
 import { nanoid, shuffle, percentOf } from '../lib/utils';
 import { getActiveLanguagePack } from '../lib/activeLanguage';
 import { getActiveProfile } from '../lib/profile';
-import type { Exercise, Session, Skill, ResumableSprintState } from '../types';
+import { getProficiency } from '../lib/proficiency';
+import { planSprint } from '../lib/recommendations';
+import type { CEFRLevel, Exercise, Session, Skill, ResumableSprintState } from '../types';
 
 type Phase = 'select' | 'resume_prompt' | 'running' | 'summary';
 
 function buildSprintQueue(durationMins: 5 | 10 | 20): Exercise[] {
-  const progress = getProgress();
   const settings = getSettings();
   const dueMistakes = getDueMistakes();
   const pack = getActiveLanguagePack();
 
-  const objectiveTypes = new Set([
-    'multipleChoice', 'cloze', 'connectorChoice',
-    'collocationChoice', 'accentPractice', 'readingQuestion',
-  ]);
-
-  const allObjective = pack.exercises.filter(
-    e => objectiveTypes.has(e.type) && e.skill !== 'listening' && e.skill !== 'speaking',
-  );
-
-  const recentIds = new Set(getRecentExerciseIds());
-
-  // Helper: prefer non-recent candidates; fall back to full pool if necessary.
-  function pickFresh(candidates: Exercise[], n: number): Exercise[] {
-    const fresh = shuffle(candidates.filter(e => !recentIds.has(e.id)));
-    if (fresh.length >= n) return fresh.slice(0, n);
-    const stale = shuffle(candidates.filter(e => recentIds.has(e.id)));
-    return [...fresh, ...stale].slice(0, n);
-  }
-
-  // Weak skills from past scores
-  const weakSkills = (Object.entries(progress.skillScores) as [Skill, number][])
-    .filter(([s]) => s !== 'listening' && s !== 'speaking')
-    .sort(([, a], [, b]) => a - b)
-    .slice(0, 3)
-    .map(([s]) => s);
-
   const targetCount = durationMins === 5 ? 8 : durationMins === 10 ? 15 : 25;
-  const selected: Exercise[] = [];
 
-  const weakCount = Math.floor(targetCount * 0.5);
-  const weakExercises = weakSkills.length > 0
-    ? allObjective.filter(e => weakSkills.includes(e.skill))
-    : allObjective;
-  selected.push(...pickFresh(weakExercises, weakCount));
-
-  const reviewCount = Math.floor(targetCount * 0.25);
-  const reviewExercises = dueMistakes
-    .slice(0, reviewCount)
-    .map(m => pack.exercises.find(e => e.id === m.exerciseId))
-    .filter((e): e is Exercise => !!e);
-  selected.push(...reviewExercises);
-
-  const used = new Set(selected.map(e => e.id));
-  const remaining = allObjective.filter(e => !used.has(e.id));
-  const needed = Math.max(0, targetCount - selected.length);
-  selected.push(...pickFresh(remaining, needed));
-
-  let queue = shuffle(selected);
+  const plan = planSprint({
+    exercises: pack.exercises,
+    count: targetCount,
+    estimate: getProficiency(),
+    dueMistakeExerciseIds: dueMistakes.map(m => m.exerciseId),
+    recentExerciseIds: getRecentExerciseIds(),
+    targetLevel: (settings.targetLevel ?? 'B1') as CEFRLevel,
+  });
+  let queue = plan.queue;
 
   // Optionally include a single writing prompt per writingFrequency setting
   const shouldIncludeWriting =
@@ -173,6 +138,18 @@ export default function Sprint() {
     setAttempted(newAttempted); setCorrect(newCorrect); setSkillsWorked(newSkills);
 
     const dueMistake = getDueMistakes().find(m => m.exerciseId === ex.id);
+
+    recordEvidence({
+      exercise: ex,
+      languageId: profile!.targetLanguage,
+      activityType: dueMistake ? 'review' : 'sprint',
+      correct: params.correct,
+      userAnswer: params.userAnswer,
+      confidence: params.confidence,
+      timeSpentSeconds: params.timeSpent,
+      isReview: !!dueMistake,
+    });
+
     if (dueMistake) {
       if (params.correct) {
         recordCorrectReview(dueMistake.id, params.confidence, params.timeSpent);
@@ -318,6 +295,16 @@ export default function Sprint() {
           exercise={exercise}
           onAnswer={handleAnswer}
           onSkip={() => {
+            recordEvidence({
+              exercise,
+              languageId: profile!.targetLanguage,
+              activityType: 'sprint',
+              correct: false,
+              skipped: true,
+              userAnswer: '',
+              confidence: 'low',
+              timeSpentSeconds: 0,
+            });
             const nextIndex = currentIndex + 1;
             persistSprintProgress(nextIndex, correct, attempted, mistakesAdded, skillsWorked);
             if (nextIndex >= queue.length) finishSprint(correct, attempted, mistakesAdded, skillsWorked);

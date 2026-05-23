@@ -1,18 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   getProgress, getMistakes, getDueMistakes, getLatestDiagnostic, getSessions,
-  getActiveProfileLastSavedAt,
+  getActiveProfileLastSavedAt, getEvidence,
+  hasPendingMigrationNotice, dismissMigrationNotice,
 } from '../lib/storage';
 import { getActiveProfile } from '../lib/profile';
 import { getLanguagePack } from '../languages';
-import { placementHeadline } from '../lib/placement';
+import { getProficiency } from '../lib/proficiency';
 import LevelPath from '../components/LevelPath';
 import ProgressRing from '../components/ProgressRing';
 import WeaknessHeatmap from '../components/WeaknessHeatmap';
-import ReadinessCard from '../components/ReadinessCard';
-import type { MistakeCategory, CEFRLevel } from '../types';
-import { CEFR_ORDER, MISTAKE_LABELS, PLACEMENT_CONFIDENCE_LABELS } from '../types';
+import LevelReadinessCard from '../components/LevelReadinessCard';
+import type { MistakeCategory } from '../types';
+import { EVIDENCE_CONFIDENCE_LABELS } from '../types';
 
 function formatRelative(iso: string | null): string {
   if (!iso) return 'never';
@@ -27,6 +28,8 @@ function formatRelative(iso: string | null): string {
 export default function Dashboard() {
   const navigate = useNavigate();
   const profile = getActiveProfile();
+  const [noticeOpen, setNoticeOpen] = useState(hasPendingMigrationNotice());
+
   const pack = profile ? getLanguagePack(profile.targetLanguage) : null;
   const progress = getProgress();
   const diagnostic = getLatestDiagnostic();
@@ -34,17 +37,21 @@ export default function Dashboard() {
   const dueMistakes = getDueMistakes();
   const sessions = getSessions();
   const lastSaved = getActiveProfileLastSavedAt();
+  const evidence = getEvidence();
+  const proficiency = getProficiency();
 
-  if (!profile || !pack) return null;
+  if (!profile || !pack || !proficiency) return null;
 
-  const placement = diagnostic?.placement;
-  const currentLevel: CEFRLevel = placement?.estimatedLevel ?? 'A1';
-  const headline = placement ? placementHeadline(placement) : 'No placement yet';
-  const confidenceLabel = placement ? PLACEMENT_CONFIDENCE_LABELS[placement.confidence] : '';
+  const showDiagnosticPrompt = !diagnostic && evidence.length === 0;
 
-  const nextTarget = nextLevelAfter(currentLevel, profile.targetLevel);
+  const currentLevel = proficiency.currentEstimate;
+  const headline = proficiency.boundary
+    ? `${proficiency.currentEstimate}/${proficiency.boundary} boundary`
+    : proficiency.currentEstimate;
+  const confidenceLabel = EVIDENCE_CONFIDENCE_LABELS[proficiency.estimateConfidence];
+  const currentRing = proficiency.readinessByLevel.find(l => l.level === currentLevel)?.readiness ?? 0;
 
-  // Build mistake category counts
+  // Mistake category counts (for heatmap).
   const mistakeCounts: Partial<Record<MistakeCategory, number>> = {};
   for (const m of mistakes) {
     for (const cat of m.mistakeCategories) {
@@ -52,19 +59,33 @@ export default function Dashboard() {
     }
   }
 
+  // Momentum (activity, not level).
   const recentSessions = sessions.slice(-5);
   const recentAccuracy = recentSessions.length > 0
     ? Math.round(recentSessions.reduce((sum, s) => sum + s.accuracy, 0) / recentSessions.length)
     : null;
+  const reviewsCompleted = evidence.filter(e => e.isReview).length;
 
-  const readinessByLevel: Partial<Record<CEFRLevel, number>> = { ...progress.levelReadiness };
-  if (placement) {
-    for (const ev of placement.perLevel) readinessByLevel[ev.level] = ev.readiness;
+  const q = proficiency.evidenceQuality;
+
+  function dismissNotice() {
+    dismissMigrationNotice();
+    setNoticeOpen(false);
   }
 
   return (
     <div className="space-y-6 pb-10" data-testid="dashboard">
-      {/* Header */}
+      {noticeOpen && (
+        <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 flex items-start justify-between gap-3" data-testid="migration-notice">
+          <div className="text-sm text-sky-900">
+            Your progress was upgraded to a stricter scoring model. Some readiness estimates may change.
+          </div>
+          <button onClick={dismissNotice} className="text-sky-600 text-sm font-semibold shrink-0 hover:text-sky-800">
+            Dismiss
+          </button>
+        </div>
+      )}
+
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
@@ -81,8 +102,7 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* No diagnostic yet */}
-      {!placement && (
+      {showDiagnosticPrompt && (
         <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-6 text-center">
           <div className="text-4xl mb-3">🎯</div>
           <h3 className="text-lg font-bold text-slate-800 mb-1">Take the placement diagnostic</h3>
@@ -98,163 +118,183 @@ export default function Dashboard() {
         </div>
       )}
 
-      {placement && (
-        <>
-          {/* Current level + path */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-              <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-3">Current estimate</div>
-              <div className="flex items-center gap-4">
-                <ProgressRing
-                  pct={readinessByLevel[currentLevel] ?? 50}
-                  size={72} stroke={7} color="#6366f1"
-                  label={currentLevel}
-                />
-                <div>
-                  <div className="text-2xl font-bold text-slate-800">{headline}</div>
-                  <div className="text-xs text-slate-400 mt-1">{confidenceLabel}</div>
-                  {nextTarget && (
-                    <div className="text-xs text-indigo-600 font-medium mt-1">
-                      Next target: {nextTarget}
-                    </div>
-                  )}
+      {/* Current estimate + today */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+          <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-3">CEFR estimate (evidence-based)</div>
+          <div className="flex items-center gap-4">
+            <ProgressRing pct={currentRing} size={72} stroke={7} color="#6366f1" label={currentLevel} />
+            <div>
+              <div className="text-2xl font-bold text-slate-800">{headline}</div>
+              <div className="text-xs text-slate-400 mt-1">{confidenceLabel}</div>
+              {proficiency.nextTarget && (
+                <div className="text-xs text-indigo-600 font-medium mt-1">
+                  Next target: {proficiency.nextTarget}
                 </div>
-              </div>
-              <div className="mt-4">
-                <LevelPath currentLevel={currentLevel} targetLevel={profile.targetLevel} />
-              </div>
-            </div>
-
-            <div className="bg-indigo-600 rounded-2xl p-5 text-white">
-              <div className="text-xs text-indigo-200 uppercase tracking-wide font-semibold mb-2">Today</div>
-              <div className="text-base font-bold mb-1">Daily Sprint</div>
-              <div className="text-sm text-indigo-100 mb-4">
-                {progress.dailyTime} minutes · adaptive to your weak areas
-              </div>
-              <button
-                onClick={() => navigate('/sprint')}
-                className="w-full py-2.5 rounded-xl bg-white text-indigo-700 font-semibold text-sm hover:bg-indigo-50"
-              >
-                Start today's sprint →
-              </button>
-            </div>
-          </div>
-
-          {/* Readiness per CEFR level (A1–C1) */}
-          <div>
-            <h2 className="text-base font-bold text-slate-800 mb-3">CEFR readiness</h2>
-            <p className="text-xs text-slate-400 mb-3">
-              Estimates based on placement evidence. Listening and speaking are not scored yet.
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3" data-testid="readiness-grid">
-              {CEFR_ORDER.map(level => {
-                const ev = placement.perLevel.find(p => p.level === level);
-                return (
-                  <ReadinessCard
-                    key={level}
-                    level={level}
-                    readiness={readinessByLevel[level] ?? 0}
-                    status={ev?.status ?? 'unknown'}
-                    attempted={ev?.attempted ?? 0}
-                    isCurrent={level === currentLevel}
-                  />
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Bottleneck + due */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-amber-50 rounded-2xl border border-amber-200 p-5">
-              <div className="text-xs text-amber-600 uppercase tracking-wide font-semibold mb-2">Notes from the diagnostic</div>
-              {placement.notes.length === 0 ? (
-                <div className="text-sm text-amber-900">Nothing flagged — keep practicing!</div>
-              ) : (
-                <ul className="text-sm text-amber-900 space-y-1.5 leading-snug list-disc list-inside">
-                  {placement.notes.slice(0, 4).map((n, i) => <li key={i}>{n}</li>)}
-                </ul>
               )}
             </div>
-
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center justify-between">
-              <div>
-                <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">Review due</div>
-                <div className={`text-2xl font-bold ${dueMistakes.length > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
-                  {dueMistakes.length}
-                </div>
-                <div className="text-xs text-slate-400 mt-0.5">
-                  {dueMistakes.length === 1 ? 'item' : 'items'} to review today
-                </div>
-              </div>
-              <button
-                onClick={() => navigate('/review')}
-                disabled={dueMistakes.length === 0}
-                className="px-4 py-2.5 rounded-xl bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 disabled:opacity-40"
-              >
-                Review now →
-              </button>
-            </div>
           </div>
-
-          {/* Momentum + saved status */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-            <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-3">Momentum</div>
-            <div className="grid grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-xl font-bold text-slate-800">{progress.totalMinutes}</div>
-                <div className="text-xs text-slate-400 mt-1">Minutes total</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-slate-800">{progress.sessionCount}</div>
-                <div className="text-xs text-slate-400 mt-1">Sessions</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-slate-800">
-                  {recentAccuracy !== null ? `${recentAccuracy}%` : '—'}
-                </div>
-                <div className="text-xs text-slate-400 mt-1">Recent accuracy</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xs font-bold text-emerald-600">Saved</div>
-                <div className="text-xs text-slate-400 mt-1">{formatRelative(lastSaved)}</div>
-              </div>
-            </div>
+          <div className="mt-4">
+            <LevelPath currentLevel={currentLevel} targetLevel={profile.targetLevel} />
           </div>
+        </div>
 
-          {/* Listening / Speaking placeholders */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {(['listening', 'speaking'] as const).map(skill => (
-              <div key={skill} className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">{skill}</div>
-                <div className="text-sm font-semibold text-slate-700">Coming soon</div>
-                <div className="text-xs text-slate-400 mt-1">
-                  Not included in your level estimate yet.
-                </div>
-              </div>
-            ))}
+        <div className="bg-indigo-600 rounded-2xl p-5 text-white">
+          <div className="text-xs text-indigo-200 uppercase tracking-wide font-semibold mb-2">Today</div>
+          <div className="text-base font-bold mb-1">Daily Sprint</div>
+          <div className="text-sm text-indigo-100 mb-4">
+            {progress.dailyTime} minutes · adaptive to your weak areas
           </div>
+          <button
+            onClick={() => navigate('/sprint')}
+            className="w-full py-2.5 rounded-xl bg-white text-indigo-700 font-semibold text-sm hover:bg-indigo-50"
+          >
+            Start today's sprint →
+          </button>
+        </div>
+      </div>
 
-          {/* Heatmap */}
-          {Object.keys(mistakeCounts).length > 0 && (
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-              <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-3">Weakness heatmap</div>
-              <p className="text-xs text-slate-400 mb-3">Based on tracked mistakes. Red = most errors.</p>
-              <WeaknessHeatmap mistakeCounts={mistakeCounts} />
-            </div>
-          )}
+      {/* CEFR readiness — conservative, evidence-based */}
+      <div>
+        <h2 className="text-base font-bold text-slate-800 mb-3">CEFR readiness</h2>
+        <p className="text-xs text-slate-400 mb-3">
+          Based on unseen calibrated evidence. Repeated items and reviews don't raise your level.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3" data-testid="readiness-grid">
+          {proficiency.readinessByLevel.map(lr => (
+            <LevelReadinessCard key={lr.level} data={lr} isCurrent={lr.level === currentLevel} />
+          ))}
+        </div>
+      </div>
 
-          <div className="text-center text-xs text-slate-400 pb-4">
-            All CEFR estimates are unofficial. Writing scores are self-rated and not assessed by an examiner.
+      {/* Evidence quality */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5" data-testid="evidence-quality">
+        <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-3">Evidence quality</div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div>
+            <div className="text-xl font-bold text-emerald-600">{q.unseenCalibratedItems}</div>
+            <div className="text-xs text-slate-400 mt-1">Unseen calibrated items</div>
           </div>
-        </>
+          <div>
+            <div className="text-xl font-bold text-amber-600">{q.repeatedItems}</div>
+            <div className="text-xs text-slate-400 mt-1">Repeated items</div>
+          </div>
+          <div>
+            <div className="text-xl font-bold text-indigo-600">{q.writingSamples}</div>
+            <div className="text-xs text-slate-400 mt-1">Writing samples</div>
+          </div>
+          <div>
+            <div className="text-xl font-bold text-slate-700">{EVIDENCE_CONFIDENCE_LABELS[q.latestConfidence]}</div>
+            <div className="text-xs text-slate-400 mt-1">Latest estimate confidence</div>
+          </div>
+        </div>
+        {q.levelsWithInsufficientEvidence.length > 0 && (
+          <div className="text-xs text-slate-500 mt-3">
+            Insufficient evidence at: {q.levelsWithInsufficientEvidence.join(', ')}
+            {q.legacyItems > 0 && ` · ${q.legacyItems} legacy items preserved (low weight)`}
+          </div>
+        )}
+      </div>
+
+      {/* Recommendations + warnings */}
+      {(proficiency.recommendedNextActions.length > 0 || proficiency.evidenceWarnings.length > 0) && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-indigo-50 rounded-2xl border border-indigo-200 p-5">
+            <div className="text-xs text-indigo-600 uppercase tracking-wide font-semibold mb-2">Recommended next</div>
+            <ul className="text-sm text-indigo-900 space-y-1.5 leading-snug list-disc list-inside">
+              {proficiency.recommendedNextActions.slice(0, 4).map((n, i) => <li key={i}>{n}</li>)}
+            </ul>
+          </div>
+          <div className="bg-amber-50 rounded-2xl border border-amber-200 p-5">
+            <div className="text-xs text-amber-600 uppercase tracking-wide font-semibold mb-2">Evidence notes</div>
+            {proficiency.evidenceWarnings.length === 0 && proficiency.bottlenecks.length === 0 ? (
+              <div className="text-sm text-amber-900">Nothing flagged — keep building fresh evidence.</div>
+            ) : (
+              <ul className="text-sm text-amber-900 space-y-1.5 leading-snug list-disc list-inside">
+                {[...proficiency.bottlenecks, ...proficiency.evidenceWarnings].slice(0, 4).map((n, i) => <li key={i}>{n}</li>)}
+              </ul>
+            )}
+          </div>
+        </div>
       )}
+
+      {/* Review due */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center justify-between">
+        <div>
+          <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">Review due</div>
+          <div className={`text-2xl font-bold ${dueMistakes.length > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+            {dueMistakes.length}
+          </div>
+          <div className="text-xs text-slate-400 mt-0.5">
+            {dueMistakes.length === 1 ? 'item' : 'items'} to review today
+          </div>
+        </div>
+        <button
+          onClick={() => navigate('/review')}
+          disabled={dueMistakes.length === 0}
+          className="px-4 py-2.5 rounded-xl bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 disabled:opacity-40"
+        >
+          Review now →
+        </button>
+      </div>
+
+      {/* Momentum — activity, not proficiency */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5" data-testid="momentum">
+        <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">Momentum</div>
+        <p className="text-xs text-slate-400 mb-3">Activity and habit — separate from your CEFR readiness.</p>
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
+          <div className="text-center">
+            <div className="text-xl font-bold text-slate-800">{progress.totalMinutes}</div>
+            <div className="text-xs text-slate-400 mt-1">Minutes</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-slate-800">{progress.sessionCount}</div>
+            <div className="text-xs text-slate-400 mt-1">Sessions</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-slate-800">{progress.streakDays}</div>
+            <div className="text-xs text-slate-400 mt-1">Day streak</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-slate-800">{reviewsCompleted}</div>
+            <div className="text-xs text-slate-400 mt-1">Reviews</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-slate-800">
+              {recentAccuracy !== null ? `${recentAccuracy}%` : '—'}
+            </div>
+            <div className="text-xs text-slate-400 mt-1">Practice acc.</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xs font-bold text-emerald-600">Saved</div>
+            <div className="text-xs text-slate-400 mt-1">{formatRelative(lastSaved)}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Listening / Speaking placeholders */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {(['listening', 'speaking'] as const).map(skill => (
+          <div key={skill} className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+            <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">{skill}</div>
+            <div className="text-sm font-semibold text-slate-700">Coming soon</div>
+            <div className="text-xs text-slate-400 mt-1">Not included in your level estimate yet.</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Heatmap */}
+      {Object.keys(mistakeCounts).length > 0 && (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+          <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-3">Weakness heatmap</div>
+          <p className="text-xs text-slate-400 mb-3">Based on tracked mistakes. Red = most errors.</p>
+          <WeaknessHeatmap mistakeCounts={mistakeCounts} />
+        </div>
+      )}
+
+      <div className="text-center text-xs text-slate-400 pb-4">
+        All CEFR estimates are unofficial. Writing scores are heuristic, not assessed by an examiner.
+      </div>
     </div>
   );
-}
-
-function nextLevelAfter(current: CEFRLevel, target: CEFRLevel): CEFRLevel | null {
-  const ci = CEFR_ORDER.indexOf(current);
-  const ti = CEFR_ORDER.indexOf(target);
-  if (ci >= ti) return null;
-  return CEFR_ORDER[ci + 1];
 }

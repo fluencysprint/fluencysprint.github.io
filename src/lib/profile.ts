@@ -2,11 +2,12 @@ import type {
   Profile, LanguageId, CEFRLevel,
   UserProgress, MistakeRecord, Session, WritingEntry, SpeakingEntry,
   DiagnosticResult, AppSettings, ResumableDiagnosticState, ResumableSprintState,
+  EvidenceEvent,
 } from '../types';
 import { readJSON, writeJSON, removeKey, listKeysWithPrefix } from './storageAdapter';
 import { nanoid } from './utils';
 
-export const STORAGE_VERSION = '1';
+export const STORAGE_VERSION = '2';
 
 export const KEYS = {
   VERSION: 'fluencySprint.storageVersion',
@@ -30,6 +31,12 @@ export interface ProfileData {
   sprintSession?: ResumableSprintState;
   drafts: Record<string, { text: string; savedAt: string }>;
   recentExerciseIds: string[];
+  /** Append-only evidence ledger (every recorded action). */
+  evidence: EvidenceEvent[];
+  /** Storage schema version this blob was last written under. */
+  schemaVersion?: string;
+  /** True after a v1→v2 upgrade until the user dismisses the notice. */
+  pendingMigrationNotice?: boolean;
 }
 
 // ─── Defaults ───────────────────────────────────────────────────────────────
@@ -80,6 +87,8 @@ export function emptyProfileData(profile: Profile): ProfileData {
     settings: defaultSettingsFor(profile),
     drafts: {},
     recentExerciseIds: [],
+    evidence: [],
+    schemaVersion: STORAGE_VERSION,
   };
 }
 
@@ -186,15 +195,79 @@ export function getProfileData(id: string): ProfileData | null {
   if (!profile) return null;
   const data = readJSON<ProfileData | null>(KEYS.profileData(id), null);
   if (data) {
-    // Ensure later-added fields exist on older payloads
-    return {
+    // Detect pre-v2 blobs from the *raw* payload (before defaults are applied).
+    const rawVersion = data.schemaVersion;
+    // Ensure later-added fields exist on older payloads.
+    const merged: ProfileData = {
       ...emptyProfileData(profile),
       ...data,
       drafts: { ...(data.drafts ?? {}) },
       recentExerciseIds: data.recentExerciseIds ?? [],
+      evidence: data.evidence ?? [],
     };
+    // Upgrade pre-v2 blobs in place: seed legacy evidence, never reset data.
+    if (rawVersion !== STORAGE_VERSION) {
+      return migrateProfileDataToV2(profile, merged);
+    }
+    return merged;
   }
   return emptyProfileData(profile);
+}
+
+/**
+ * Upgrade a pre-v2 profile blob: preserve everything, convert old diagnostic
+ * answers into low-weight legacy evidence, and flag a one-time notice. Sessions
+ * and history are kept untouched (they still feed momentum). Never resets data.
+ */
+export function migrateProfileDataToV2(profile: Profile, data: ProfileData): ProfileData {
+  const hadActivity = (data.diagnostics?.length ?? 0) > 0 || (data.sessions?.length ?? 0) > 0;
+
+  // Only seed legacy evidence if none exists yet (idempotent).
+  if (data.evidence.length === 0 && (data.diagnostics?.length ?? 0) > 0) {
+    const seen = new Map<string, number>();
+    const legacy: EvidenceEvent[] = [];
+    for (const diag of data.diagnostics) {
+      for (const ans of diag.answers) {
+        const seenBefore = seen.get(ans.exerciseId) ?? 0;
+        seen.set(ans.exerciseId, seenBefore + 1);
+        legacy.push({
+          id: nanoid(),
+          profileId: profile.id,
+          languageId: diag.language,
+          activityType: 'diagnostic',
+          exerciseId: ans.exerciseId,
+          itemVersion: 1,
+          itemFamilyId: ans.exerciseId,
+          skill: ans.skill,
+          cefrLevel: ans.cefrLevel,
+          firstAttempt: seenBefore === 0,
+          seenCountBefore: seenBefore,
+          correct: ans.correct,
+          skipped: ans.skipped,
+          userAnswer: ans.userAnswer,
+          confidence: ans.confidence,
+          timeSpentSeconds: ans.timeSpent,
+          activeTimeSeconds: ans.timeSpent,
+          mistakeCategories: [],
+          scoringMode: 'legacy',
+          // Legacy diagnostic answers retain enough metadata to count weakly.
+          evidenceWeight: seenBefore === 0 ? 0.1 : 0.05,
+          isRepeat: seenBefore > 0,
+          isReview: false,
+          createdAt: diag.date,
+        });
+      }
+    }
+    data.evidence = legacy;
+  }
+
+  data.schemaVersion = STORAGE_VERSION;
+  // Surface a one-time notice for profiles that actually had prior progress.
+  if (hadActivity && data.pendingMigrationNotice === undefined) {
+    data.pendingMigrationNotice = true;
+  }
+  saveProfileData(profile.id, data);
+  return data;
 }
 
 export function saveProfileData(id: string, data: ProfileData): void {

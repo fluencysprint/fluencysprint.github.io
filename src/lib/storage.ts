@@ -251,6 +251,26 @@ export function markExercisesSeen(ids: string[]): void {
   });
 }
 
+// ─── Evidence ledger ───────────────────────────────────────────────────────
+
+export function getEvidence(): import('../types').EvidenceEvent[] {
+  return readActive()?.data.evidence ?? [];
+}
+
+export function addEvidenceEvent(event: import('../types').EvidenceEvent): void {
+  writeActive(d => { d.evidence.push(event); });
+}
+
+// ─── Migration notice ──────────────────────────────────────────────────────
+
+export function hasPendingMigrationNotice(): boolean {
+  return readActive()?.data.pendingMigrationNotice === true;
+}
+
+export function dismissMigrationNotice(): void {
+  writeActive(d => { d.pendingMigrationNotice = false; });
+}
+
 // ─── Streak ────────────────────────────────────────────────────────────────
 
 export function updateStreak(): number {

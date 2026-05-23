@@ -142,6 +142,22 @@ export interface Exercise {
   wordTargetMax?: number;
   requiredElements?: string[];
   checklist?: string[];
+  // ─── Calibration metadata (optional; defaults derived for legacy items) ───
+  /** Content revision; bump when an item's wording/answer changes. */
+  itemVersion?: number;
+  /** Groups near-identical items so repeats of a family don't re-count. */
+  itemFamilyId?: string;
+  /** Finer-grained tag within a skill (e.g. "preterite_imperfect"). */
+  subskill?: string;
+  /** The competence the item targets (e.g. "verb aspect contrast"). */
+  construct?: string;
+  /** Which language this item belongs to (tagged at pack-build time). */
+  languageId?: LanguageId;
+  /** Whether the item may appear in readiness exams. Defaults by type. */
+  examEligible?: boolean;
+  diagnosticEligible?: boolean;
+  sprintEligible?: boolean;
+  reviewEligible?: boolean;
 }
 
 export interface ReadingText {
@@ -384,6 +400,116 @@ export interface ResumableSprintState {
   lastSavedAt: string;
 }
 
+// ─── Evidence ledger ────────────────────────────────────────────────────────
+
+export type ActivityType =
+  | 'diagnostic' | 'sprint' | 'readiness_exam' | 'review' | 'writing' | 'drill';
+
+export type ScoringMode =
+  | 'objective' | 'heuristic_writing' | 'self_rating' | 'legacy';
+
+/**
+ * A single recorded action. Every answer/skip/submission produces one of these.
+ * The evidenceWeight field encodes how much this event may move a level
+ * estimate (repeats, reviews, low confidence and legacy items are discounted).
+ */
+export interface EvidenceEvent {
+  id: string;
+  profileId: string;
+  languageId: LanguageId;
+  activityType: ActivityType;
+  exerciseId: string;
+  itemVersion: number;
+  itemFamilyId: string;
+  skill: Skill;
+  subskill?: string;
+  cefrLevel: CEFRLevel;
+  construct?: string;
+  firstAttempt: boolean;
+  seenCountBefore: number;
+  correct: boolean;
+  skipped: boolean;
+  userAnswer: string;
+  confidence: 'low' | 'medium' | 'high';
+  timeSpentSeconds: number;
+  activeTimeSeconds: number;
+  mistakeCategories: MistakeCategory[];
+  scoringMode: ScoringMode;
+  /** 0..1 contribution toward level promotion. */
+  evidenceWeight: number;
+  isRepeat: boolean;
+  isReview: boolean;
+  createdAt: string;
+}
+
+// ─── Proficiency estimation outputs ─────────────────────────────────────────
+
+/** How much trustworthy evidence backs an estimate. */
+export type EvidenceConfidence =
+  | 'insufficient' // 0-4 unseen calibrated items
+  | 'very_low'     // 5-9
+  | 'low'          // 10-19
+  | 'medium'       // 20-39
+  | 'strong';      // 40+
+
+/** User-facing readiness label for a level card. */
+export type ReadinessBand =
+  | 'insufficient'
+  | 'early_signal'
+  | 'developing'
+  | 'likely_ready'
+  | 'strong';
+
+export interface LevelReadiness {
+  level: CEFRLevel;
+  /** 0..100 weighted readiness. */
+  readiness: number;
+  band: ReadinessBand;
+  confidence: EvidenceConfidence;
+  unseenItems: number;
+  repeatedItems: number;
+  /** Sum of evidence weights backing this level. */
+  weightedEvidence: number;
+  /** Weight-weighted accuracy 0..1. */
+  accuracyWeighted: number;
+  /** Set when a weaker lower level capped this estimate. */
+  gatedBy?: CEFRLevel;
+}
+
+export interface SkillReadiness {
+  skill: Skill;
+  /** Weighted, unseen-based proficiency. Null when no usable evidence. */
+  proficiency: number | null;
+  /** Raw app accuracy including repeats — "practice score". */
+  practiceScore: number | null;
+  confidence: EvidenceConfidence;
+  unseenItems: number;
+  repeatedItems: number;
+}
+
+export interface EvidenceQuality {
+  unseenCalibratedItems: number;
+  repeatedItems: number;
+  writingSamples: number;
+  legacyItems: number;
+  levelsWithInsufficientEvidence: CEFRLevel[];
+  latestConfidence: EvidenceConfidence;
+}
+
+export interface ProficiencyEstimate {
+  language: LanguageId;
+  currentEstimate: CEFRLevel;
+  boundary?: CEFRLevel;
+  estimateConfidence: EvidenceConfidence;
+  nextTarget: CEFRLevel | null;
+  readinessByLevel: LevelReadiness[];
+  readinessBySkill: SkillReadiness[];
+  bottlenecks: string[];
+  evidenceWarnings: string[];
+  recommendedNextActions: string[];
+  evidenceQuality: EvidenceQuality;
+}
+
 // ─── Labels ─────────────────────────────────────────────────────────────────
 
 export const SKILL_LABELS: Record<Skill, string> = {
@@ -442,4 +568,20 @@ export const PLACEMENT_CONFIDENCE_LABELS: Record<PlacementConfidence, string> = 
   low: 'Low confidence',
   medium: 'Medium confidence',
   high: 'High confidence',
+};
+
+export const READINESS_BAND_LABELS: Record<ReadinessBand, string> = {
+  insufficient: 'Insufficient evidence',
+  early_signal: 'Early signal',
+  developing: 'Developing',
+  likely_ready: 'Likely ready for mock',
+  strong: 'Strong evidence',
+};
+
+export const EVIDENCE_CONFIDENCE_LABELS: Record<EvidenceConfidence, string> = {
+  insufficient: 'Insufficient evidence',
+  very_low: 'Very low confidence',
+  low: 'Low confidence',
+  medium: 'Medium confidence',
+  strong: 'Stronger confidence',
 };

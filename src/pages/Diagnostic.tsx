@@ -6,6 +6,7 @@ import {
   getResumableDiagnostic, saveResumableDiagnostic,
 } from '../lib/storage';
 import { recordMistake } from '../lib/scheduler';
+import { recordEvidence } from '../lib/evidence';
 import { nanoid } from '../lib/utils';
 import { buildAdaptiveDiagnosticPlan, computePlacement, levelReadinessFromPlacement, skillScoresFromPlacement } from '../lib/placement';
 import { getActiveProfile } from '../lib/profile';
@@ -110,6 +111,17 @@ export default function Diagnostic() {
     setAnswers(newAnswers);
     persistProgress(newAnswers, currentIndex + 1);
 
+    recordEvidence({
+      exercise: ex,
+      languageId: profile!.targetLanguage,
+      activityType: 'diagnostic',
+      correct: params.correct,
+      userAnswer: params.userAnswer,
+      confidence: params.confidence,
+      timeSpentSeconds: params.timeSpent,
+      mistakeCategories: params.analysis?.suggestedFocusAreas ?? ex.mistakeCategories,
+    });
+
     if (!params.correct && ex.correctAnswer) {
       recordMistake({
         exerciseId: ex.id,
@@ -181,6 +193,16 @@ export default function Diagnostic() {
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
     persistProgress(newAnswers, currentIndex + 1);
+    recordEvidence({
+      exercise: ex,
+      languageId: profile!.targetLanguage,
+      activityType: 'diagnostic',
+      correct: false,
+      skipped: true,
+      userAnswer: '',
+      confidence: 'low',
+      timeSpentSeconds: 0,
+    });
     if (currentIndex + 1 >= diagnosticItems.length) {
       finishDiagnostic(newAnswers);
     } else {

@@ -3,12 +3,14 @@ import { describe, it, expect } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
 import Dashboard from '../../pages/Dashboard';
+import Skills from '../../pages/Skills';
 import Onboarding from '../../pages/Onboarding';
 import Listening from '../../pages/Listening';
 import Speaking from '../../pages/Speaking';
 import { resetAllAppData, createProfile } from '../../lib/profile';
-import { refreshActiveProfileCache, addDiagnosticResult } from '../../lib/storage';
-import type { PlacementResult } from '../../types';
+import { refreshActiveProfileCache } from '../../lib/storage';
+import { recordEvidence } from '../../lib/evidence';
+import type { Exercise, CEFRLevel } from '../../types';
 
 function ensureProfile(opts?: { language?: 'spanish' | 'english' }) {
   resetAllAppData();
@@ -23,43 +25,60 @@ function ensureProfile(opts?: { language?: 'spanish' | 'english' }) {
   refreshActiveProfileCache();
 }
 
-describe('Dashboard — A1 through C1 readiness', () => {
-  it('renders all five CEFR readiness cards once a placement exists', () => {
-    ensureProfile();
-    const placement: PlacementResult = {
-      language: 'spanish',
-      estimatedLevel: 'A2',
-      confidence: 'medium',
-      perLevel: [
-        { level: 'A1', attempted: 4, correct: 4, skipped: 0, accuracy: 1, status: 'strong', readiness: 100 },
-        { level: 'A2', attempted: 4, correct: 3, skipped: 0, accuracy: 0.75, status: 'developing', readiness: 75 },
-        { level: 'B1', attempted: 3, correct: 1, skipped: 0, accuracy: 0.33, status: 'not_yet', readiness: 33 },
-        { level: 'B2', attempted: 0, correct: 0, skipped: 0, accuracy: 0, status: 'unknown', readiness: 0 },
-        { level: 'C1', attempted: 0, correct: 0, skipped: 0, accuracy: 0, status: 'unknown', readiness: 0 },
-      ],
-      skillEstimates: [],
-      itemsAttempted: 11,
-      itemsSkipped: 0,
-      writingAttempted: false,
-      notes: ['Writing estimate unavailable — take a writing check later.'],
-    };
-    addDiagnosticResult({
-      id: 'd1', date: new Date().toISOString(), language: 'spanish',
-      answers: [], placement, timeSpent: 300, itemCount: 11,
-    });
+function fakeItem(level: CEFRLevel, n: number): Exercise {
+  return {
+    id: `es-fake-${level}-${n}`, type: 'multipleChoice', skill: 'grammar', cefrLevel: level,
+    prompt: 'p', choices: ['a', 'b'], correctAnswer: 'a', explanation: 'e',
+    mistakeCategories: [], tags: [], estimatedSeconds: 10, difficulty: 2,
+    accentSensitive: false, keyboardHelp: false, itemFamilyId: `es-fake-${level}-${n}`, construct: 'c',
+  };
+}
 
+function seedEvidence(level: CEFRLevel, count: number, correct: number) {
+  for (let i = 0; i < count; i++) {
+    recordEvidence({
+      exercise: fakeItem(level, i), languageId: 'spanish', activityType: 'diagnostic',
+      correct: i < correct, userAnswer: 'a', confidence: 'high', timeSpentSeconds: 10,
+    });
+  }
+}
+
+describe('Dashboard — evidence-based readiness', () => {
+  it('renders five CEFR readiness cards, evidence quality and momentum once evidence exists', () => {
+    ensureProfile();
+    seedEvidence('A2', 8, 7);
     render(<MemoryRouter><Dashboard /></MemoryRouter>);
-    expect(screen.getByTestId('readiness-A1')).toBeInTheDocument();
-    expect(screen.getByTestId('readiness-A2')).toBeInTheDocument();
-    expect(screen.getByTestId('readiness-B1')).toBeInTheDocument();
-    expect(screen.getByTestId('readiness-B2')).toBeInTheDocument();
-    expect(screen.getByTestId('readiness-C1')).toBeInTheDocument();
+    for (const lvl of ['A1', 'A2', 'B1', 'B2', 'C1']) {
+      expect(screen.getByTestId(`level-readiness-${lvl}`)).toBeInTheDocument();
+    }
+    // Evidence quality is shown separately from momentum (test 34, 35).
+    expect(screen.getByTestId('evidence-quality')).toBeInTheDocument();
+    expect(screen.getByTestId('momentum')).toBeInTheDocument();
   });
 
-  it('prompts for diagnostic when no placement exists', () => {
+  it('a level with only 2 items shows insufficient/early signal, never strong (test 32)', () => {
+    ensureProfile();
+    seedEvidence('B2', 2, 2);
+    render(<MemoryRouter><Dashboard /></MemoryRouter>);
+    const card = screen.getByTestId('level-readiness-B2');
+    expect(card.textContent).toMatch(/Insufficient evidence|Early signal/i);
+    expect(card.textContent).not.toMatch(/Strong evidence/i);
+  });
+
+  it('prompts for the diagnostic when there is no evidence at all', () => {
     ensureProfile();
     render(<MemoryRouter><Dashboard /></MemoryRouter>);
     expect(screen.getByText(/Take the placement diagnostic/i)).toBeInTheDocument();
+  });
+});
+
+describe('Skill map — proficiency vs practice', () => {
+  it('shows "Not enough data" for a skill with too little evidence (test 33)', () => {
+    ensureProfile();
+    seedEvidence('A2', 2, 2); // only grammar, and too few
+    render(<MemoryRouter><Skills /></MemoryRouter>);
+    // Reading/vocabulary etc. have no evidence → "Not enough data".
+    expect(screen.getAllByText(/Not enough data/i).length).toBeGreaterThan(0);
   });
 });
 

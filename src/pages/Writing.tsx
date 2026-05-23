@@ -7,11 +7,12 @@ import {
   getDraft, clearDraft, getWritingEntries,
 } from '../lib/storage';
 import { recordMistake } from '../lib/scheduler';
+import { recordEvidence } from '../lib/evidence';
 import { useActiveTime } from '../lib/activeTime';
 import { analyzeWriting, type WritingAnalysisResult } from '../lib/writingAnalysis';
 import { nanoid, formatDuration } from '../lib/utils';
 import { getActiveLanguagePack } from '../lib/activeLanguage';
-import type { WritingPromptMeta } from '../types';
+import type { Exercise, WritingPromptMeta } from '../types';
 
 type Phase = 'select' | 'writing' | 'review' | 'done';
 
@@ -60,6 +61,29 @@ export default function Writing() {
     });
     setAnalysis(result);
     setPhase('review');
+
+    // Record writing evidence (heuristic, discounted vs. objective items).
+    const writingConfidence = result.score >= 75 ? 'high' : result.score >= 55 ? 'medium' : 'low';
+    const syntheticExercise: Exercise = {
+      id: selectedPrompt.id, type: 'writingPrompt', skill: 'writing',
+      cefrLevel: selectedPrompt.cefrLevel, prompt: selectedPrompt.prompt,
+      explanation: '', mistakeCategories: result.suggestedFocusAreas, tags: [],
+      estimatedSeconds: 0, difficulty: 3, accentSensitive: false, keyboardHelp: false,
+      itemFamilyId: selectedPrompt.id, construct: 'written production',
+      subskill: selectedPrompt.taskType,
+    };
+    recordEvidence({
+      exercise: syntheticExercise,
+      languageId: pack.metadata.id,
+      activityType: 'writing',
+      correct: result.score >= 60,
+      userAnswer: text,
+      confidence: writingConfidence,
+      timeSpentSeconds: elapsedRef.current,
+      activeTimeSeconds: activeWritingSeconds,
+      scoringMode: 'heuristic_writing',
+      mistakeCategories: result.suggestedFocusAreas,
+    });
 
     addWritingEntry({
       id: nanoid(),

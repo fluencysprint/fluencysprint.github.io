@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { getMistakes, getDueMistakes, getOverdueMistakes } from '../lib/storage';
 import { recordCorrectReview, recordMistake, sortMistakesByPriority } from '../lib/scheduler';
+import { recordEvidence } from '../lib/evidence';
 import { getActiveLanguagePack } from '../lib/activeLanguage';
+import { getActiveProfile } from '../lib/profile';
 import ExerciseRenderer from '../components/ExerciseRenderer';
 import type { MistakeRecord, MistakeCategory } from '../types';
 import { MISTAKE_LABELS } from '../types';
@@ -50,6 +52,20 @@ export default function Review() {
   }) {
     const record = queue[currentIndex];
     const ex = pack.exercises.find(e => e.id === record.exerciseId);
+    const profile = getActiveProfile();
+    if (ex && profile) {
+      // Review evidence helps retention but carries zero level-promotion weight.
+      recordEvidence({
+        exercise: ex,
+        languageId: profile.targetLanguage,
+        activityType: 'review',
+        correct: params.correct,
+        userAnswer: params.userAnswer,
+        confidence: params.confidence,
+        timeSpentSeconds: params.timeSpent,
+        isReview: true,
+      });
+    }
     if (params.correct) {
       recordCorrectReview(record.id, params.confidence, params.timeSpent);
     } else if (ex) {
