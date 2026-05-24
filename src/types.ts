@@ -23,6 +23,8 @@ export interface LanguagePackMetadata {
     diagnosticIntro: string;
     coachTagline: string;
   };
+  /** Mistake categories displayed in the weakness heatmap for this language. */
+  weaknessCategories: MistakeCategory[];
 }
 
 // ─── Skills & mistakes ──────────────────────────────────────────────────────

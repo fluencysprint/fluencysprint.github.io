@@ -9,7 +9,10 @@ import {
   resetAllAppData, saveProfiles, setActiveProfileId, createProfile,
   type ProfileData,
 } from './profile';
-import { registerFlushHandler, isStorageAvailable, getLastSaveStatus } from './storageAdapter';
+import {
+  registerFlushHandler, isStorageAvailable, getLastSaveStatus,
+  writeSessionCheckpoint, clearSessionCheckpoint,
+} from './storageAdapter';
 
 // ─── Active-profile resolver ────────────────────────────────────────────────
 
@@ -217,6 +220,12 @@ export function getResumableDiagnostic(): ResumableDiagnosticState | null {
 }
 
 export function saveResumableDiagnostic(state: ResumableDiagnosticState | null): void {
+  if (state === null) {
+    clearSessionCheckpoint();
+  } else {
+    const id = getActiveProfileId();
+    if (id) writeSessionCheckpoint({ profileId: id, type: 'diagnostic', savedAt: new Date().toISOString() });
+  }
   writeActive(d => {
     if (state === null) delete d.diagnosticSession;
     else d.diagnosticSession = { ...state, lastSavedAt: new Date().toISOString() };
@@ -228,6 +237,12 @@ export function getResumableSprint(): ResumableSprintState | null {
 }
 
 export function saveResumableSprint(state: ResumableSprintState | null): void {
+  if (state === null) {
+    clearSessionCheckpoint();
+  } else {
+    const id = getActiveProfileId();
+    if (id) writeSessionCheckpoint({ profileId: id, type: 'sprint', savedAt: new Date().toISOString() });
+  }
   writeActive(d => {
     if (state === null) delete d.sprintSession;
     else d.sprintSession = { ...state, lastSavedAt: new Date().toISOString() };

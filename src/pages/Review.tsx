@@ -28,10 +28,13 @@ export default function Review() {
   const overdueMistakes = getOverdueMistakes();
   const nonMasteredMistakes = allMistakes.filter(m => m.status !== 'mastered');
 
+  const langCategorySet = new Set<MistakeCategory>(pack.metadata.weaknessCategories);
   const catCounts: Partial<Record<MistakeCategory, number>> = {};
   for (const m of nonMasteredMistakes) {
     for (const cat of m.mistakeCategories) {
-      catCounts[cat] = (catCounts[cat] ?? 0) + 1;
+      if (langCategorySet.has(cat)) {
+        catCounts[cat] = (catCounts[cat] ?? 0) + 1;
+      }
     }
   }
   const topCats = (Object.entries(catCounts) as [MistakeCategory, number][])

@@ -23,4 +23,9 @@ export const spanishMetadata: LanguagePackMetadata = {
       'Quick adaptive placement across grammar, vocabulary, reading, and (optional) writing. Starts easy and only branches up if you show you are ready.',
     coachTagline: 'Adaptive Spanish coach · A1 → C1',
   },
+  weaknessCategories: [
+    'subjunctive', 'tense_choice', 'ser_estar', 'por_para', 'pronouns',
+    'connector_misuse', 'weak_collocation', 'false_friend', 'weak_inference',
+    'informal_register', 'weak_argument_structure', 'accent_error',
+  ],
 };

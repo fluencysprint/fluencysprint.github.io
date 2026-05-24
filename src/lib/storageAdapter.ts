@@ -130,6 +130,49 @@ export function initPersistenceLifecycle(): void {
   setInterval(flushAll, 20_000);
 }
 
+// ─── Active-session checkpoint ─────────────────────────────────────────────
+// A tiny, fast-to-write key that survives even if the main profile blob write
+// is interrupted. Checked on startup to detect potentially unsaved sessions.
+
+export const CHECKPOINT_KEY = 'fluencySprint.checkpoint';
+
+export interface SessionCheckpoint {
+  profileId: string;
+  type: 'diagnostic' | 'sprint';
+  savedAt: string;
+}
+
+export function writeSessionCheckpoint(cp: SessionCheckpoint): void {
+  if (!isStorageAvailable()) return;
+  try { localStorage.setItem(CHECKPOINT_KEY, JSON.stringify(cp)); } catch { /* ignore */ }
+}
+
+export function readSessionCheckpoint(): SessionCheckpoint | null {
+  if (!isStorageAvailable()) return null;
+  try {
+    const raw = localStorage.getItem(CHECKPOINT_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as SessionCheckpoint;
+  } catch { return null; }
+}
+
+export function clearSessionCheckpoint(): void {
+  if (!isStorageAvailable()) return;
+  try { localStorage.removeItem(CHECKPOINT_KEY); } catch { /* ignore */ }
+}
+
+// ─── Persistent storage ─────────────────────────────────────────────────────
+
+export async function requestPersistentStorage(): Promise<boolean> {
+  if (typeof navigator === 'undefined' || !navigator?.storage?.persist) return false;
+  try { return await navigator.storage.persist(); } catch { return false; }
+}
+
+export async function isPersistentStorageGranted(): Promise<boolean> {
+  if (typeof navigator === 'undefined' || !navigator?.storage?.persisted) return false;
+  try { return await navigator.storage.persisted(); } catch { return false; }
+}
+
 export function getStorageDiagnostics(): {
   available: boolean;
   approxUsageBytes: number;

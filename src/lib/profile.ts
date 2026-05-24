@@ -4,7 +4,7 @@ import type {
   DiagnosticResult, AppSettings, ResumableDiagnosticState, ResumableSprintState,
   EvidenceEvent,
 } from '../types';
-import { readJSON, writeJSON, removeKey, listKeysWithPrefix } from './storageAdapter';
+import { readJSON, writeJSON, removeKey, listKeysWithPrefix, clearSessionCheckpoint, CHECKPOINT_KEY } from './storageAdapter';
 import { nanoid } from './utils';
 
 export const STORAGE_VERSION = '2';
@@ -173,6 +173,7 @@ export function resetProfile(id: string): void {
   const profile = listProfiles().find(p => p.id === id);
   if (!profile) return;
   saveProfileData(id, emptyProfileData(profile));
+  clearSessionCheckpoint();
 }
 
 export function resetAllAppData(): void {
@@ -180,6 +181,7 @@ export function resetAllAppData(): void {
     KEYS.VERSION,
     KEYS.PROFILES,
     KEYS.ACTIVE_PROFILE_ID,
+    CHECKPOINT_KEY,
     ...listKeysWithPrefix('fluencySprint.profileData.'),
     ...listKeysWithPrefix('fluencySprint.lastSavedAt.'),
     // Also wipe legacy c1sprint.* keys for users upgrading.

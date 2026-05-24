@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   getSettings, saveSettings, getStorageStatus, refreshActiveProfileCache,
 } from '../lib/storage';
-import { onSaveStatus, type SaveStatus } from '../lib/storageAdapter';
+import { onSaveStatus, isPersistentStorageGranted, type SaveStatus } from '../lib/storageAdapter';
 import {
   listProfiles, getActiveProfile, setActiveProfileId, deleteProfile, resetProfile, resetAllAppData,
 } from '../lib/profile';
@@ -35,9 +35,13 @@ export default function Settings() {
   const [resetAllConfirm, setResetAllConfirm] = useState(false);
   const [deleteProfileConfirm, setDeleteProfileConfirm] = useState(false);
   const [saveStatus, setSaveStatusState] = useState<SaveStatus>({ kind: 'idle' });
+  const [persistentStorage, setPersistentStorage] = useState<boolean | null>(null);
   const [, forceRerender] = useState(0);
 
   useEffect(() => onSaveStatus(setSaveStatusState), []);
+  useEffect(() => {
+    isPersistentStorageGranted().then(granted => setPersistentStorage(granted));
+  }, []);
 
   const status = getStorageStatus();
   const profiles = listProfiles();
@@ -157,16 +161,29 @@ export default function Settings() {
         )}
       </div>
 
-      {/* Storage status */}
+      {/* Storage diagnostics */}
       <div className={`rounded-2xl border p-4 text-sm ${status.available ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-700'}`}>
-        <div className="font-semibold">
-          {status.available ? 'Saved locally on this device' : 'Storage unavailable'}
+        <div className="font-semibold mb-2">
+          {status.available ? 'Storage diagnostics' : 'Storage unavailable'}
         </div>
-        <div className="text-xs mt-1 opacity-80">
-          {status.available
-            ? saveStatusLabel
-            : 'Private browsing or low storage may prevent saving. Export a backup before closing.'}
-        </div>
+        {status.available ? (
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs opacity-90">
+            <dt className="font-medium">Storage available</dt>
+            <dd>Yes</dd>
+            <dt className="font-medium">Persistent storage</dt>
+            <dd>
+              {persistentStorage === null ? 'Checking...' : persistentStorage ? 'Granted' : 'Not granted'}
+            </dd>
+            <dt className="font-medium">Last saved</dt>
+            <dd>{saveStatusLabel}</dd>
+            <dt className="font-medium">Active profile ID</dt>
+            <dd className="font-mono truncate">{profile?.id ?? '—'}</dd>
+          </dl>
+        ) : (
+          <div className="text-xs mt-1 opacity-80">
+            Private browsing or low storage may prevent saving. Export a backup before closing.
+          </div>
+        )}
       </div>
 
       {/* Profile */}

@@ -51,11 +51,15 @@ export default function Dashboard() {
   const confidenceLabel = EVIDENCE_CONFIDENCE_LABELS[proficiency.estimateConfidence];
   const currentRing = proficiency.readinessByLevel.find(l => l.level === currentLevel)?.readiness ?? 0;
 
-  // Mistake category counts (for heatmap).
+  // Mistake category counts filtered to the active language's categories only.
+  const langCategories = pack.metadata.weaknessCategories;
+  const langCategorySet = new Set<MistakeCategory>(langCategories);
   const mistakeCounts: Partial<Record<MistakeCategory, number>> = {};
   for (const m of mistakes) {
     for (const cat of m.mistakeCategories) {
-      mistakeCounts[cat] = (mistakeCounts[cat] ?? 0) + 1;
+      if (langCategorySet.has(cat)) {
+        mistakeCounts[cat] = (mistakeCounts[cat] ?? 0) + 1;
+      }
     }
   }
 
@@ -288,7 +292,7 @@ export default function Dashboard() {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
           <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-3">Weakness heatmap</div>
           <p className="text-xs text-slate-400 mb-3">Based on tracked mistakes. Red = most errors.</p>
-          <WeaknessHeatmap mistakeCounts={mistakeCounts} />
+          <WeaknessHeatmap mistakeCounts={mistakeCounts} categories={langCategories} />
         </div>
       )}
 

@@ -13,7 +13,7 @@ import Listening from './pages/Listening';
 import Exam from './pages/Exam';
 import Settings from './pages/Settings';
 import { getActiveProfile, listProfiles, migrateLegacyIfNeeded } from './lib/profile';
-import { initPersistenceLifecycle } from './lib/storageAdapter';
+import { initPersistenceLifecycle, requestPersistentStorage } from './lib/storageAdapter';
 import { getSettings } from './lib/storage';
 
 function RequireProfile({ children }: { children: React.ReactNode }) {
@@ -28,6 +28,7 @@ export default function App() {
 
   useEffect(() => {
     initPersistenceLifecycle();
+    requestPersistentStorage();
     if (listProfiles().length === 0) {
       // Best-effort: lift a legacy c1sprint.* progress blob into a Spanish profile.
       const migrated = migrateLegacyIfNeeded();

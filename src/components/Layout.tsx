@@ -1,7 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { getActiveProfile } from '../lib/profile';
 import { getLanguagePack } from '../languages';
+import { onSaveStatus, type SaveStatus } from '../lib/storageAdapter';
+
+function SaveIndicator() {
+  const [status, setStatus] = useState<SaveStatus>({ kind: 'idle' });
+  useEffect(() => onSaveStatus(setStatus), []);
+  if (status.kind === 'idle') return null;
+  const label =
+    status.kind === 'saving' ? 'Saving...' :
+    status.kind === 'saved' ? 'Saved' :
+    status.kind === 'error' ? 'Save failed' : null;
+  if (!label) return null;
+  const color =
+    status.kind === 'error' ? 'text-red-500' :
+    status.kind === 'saving' ? 'text-slate-400' : 'text-emerald-500';
+  return (
+    <span className={`text-[10px] font-medium ${color}`} data-testid="save-indicator">
+      {label}
+    </span>
+  );
+}
 
 const navItems = [
   { to: '/', label: 'Home', icon: '⌂', exact: true },
@@ -67,6 +87,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {profile.displayName ? profile.displayName : 'Default profile'}
             </div>
           )}
+          <div className="mt-1"><SaveIndicator /></div>
         </div>
         {navItems.map(item => navLink(item))}
       </aside>
@@ -74,7 +95,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Mobile top bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between">
         <div className="min-w-0 flex-1 mr-2">
-          <div className="text-sm font-bold text-slate-800">Fluency Sprint</div>
+          <div className="flex items-center gap-2">
+            <div className="text-sm font-bold text-slate-800">Fluency Sprint</div>
+            <SaveIndicator />
+          </div>
           {profile && (
             <div className="text-[10px] text-indigo-600 truncate" title={profile.displayName ?? pack?.metadata.label}>
               {pack?.metadata.label ?? ''}

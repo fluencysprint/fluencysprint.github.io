@@ -22,4 +22,9 @@ export const englishMetadata: LanguagePackMetadata = {
       'Adaptive placement covering articles, tense/aspect, prepositions, vocabulary, reading, and optional writing. Starts at A1 and only goes higher if your answers support it.',
     coachTagline: 'Adaptive English coach · A1 → C1',
   },
+  weaknessCategories: [
+    'article_use', 'preposition_en', 'tense_aspect', 'word_order',
+    'phrasal_verb', 'collocation_en', 'register_en', 'connector_misuse',
+    'weak_inference', 'weak_argument_structure', 'punctuation_error',
+  ],
 };

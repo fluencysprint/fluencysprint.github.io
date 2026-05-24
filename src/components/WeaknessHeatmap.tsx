@@ -4,13 +4,9 @@ import { MISTAKE_LABELS } from '../types';
 
 interface Props {
   mistakeCounts: Partial<Record<MistakeCategory, number>>;
+  /** Ordered list of categories to display — must come from the active language pack. */
+  categories: MistakeCategory[];
 }
-
-const ALL_CATEGORIES: MistakeCategory[] = [
-  'subjunctive', 'tense_choice', 'ser_estar', 'por_para', 'pronouns',
-  'connector_misuse', 'weak_collocation', 'false_friend', 'weak_inference',
-  'informal_register', 'weak_argument_structure', 'accent_error',
-];
 
 function heatColor(count: number, max: number): string {
   if (max === 0 || count === 0) return '#f1f5f9';
@@ -27,12 +23,13 @@ function textColor(count: number, max: number): string {
   return ratio >= 0.5 ? '#fff' : '#374151';
 }
 
-export default function WeaknessHeatmap({ mistakeCounts }: Props) {
-  const max = Math.max(0, ...Object.values(mistakeCounts).filter((v): v is number => v !== undefined));
+export default function WeaknessHeatmap({ mistakeCounts, categories }: Props) {
+  // Only consider counts for categories that belong to this language.
+  const max = Math.max(0, ...categories.map(cat => mistakeCounts[cat] ?? 0));
 
   return (
     <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-      {ALL_CATEGORIES.map(cat => {
+      {categories.map(cat => {
         const count = mistakeCounts[cat] ?? 0;
         const bg = heatColor(count, max);
         const text = textColor(count, max);
