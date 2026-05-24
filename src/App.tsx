@@ -14,7 +14,7 @@ import Exam from './pages/Exam';
 import Settings from './pages/Settings';
 import { getActiveProfile, listProfiles, migrateLegacyIfNeeded } from './lib/profile';
 import { initPersistenceLifecycle, requestPersistentStorage } from './lib/storageAdapter';
-import { getSettings } from './lib/storage';
+import { initTheme } from './lib/theme';
 
 function RequireProfile({ children }: { children: React.ReactNode }) {
   const profile = getActiveProfile();
@@ -23,25 +23,16 @@ function RequireProfile({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  // Force a re-render after first-load migration so RequireProfile sees state.
   const [bootKey, setBootKey] = useState(0);
 
   useEffect(() => {
     initPersistenceLifecycle();
     requestPersistentStorage();
+    initTheme();
     if (listProfiles().length === 0) {
-      // Best-effort: lift a legacy c1sprint.* progress blob into a Spanish profile.
       const migrated = migrateLegacyIfNeeded();
       if (migrated) setBootKey(k => k + 1);
     }
-    try {
-      const settings = getSettings();
-      if (settings.theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    } catch { /* ignore */ }
   }, []);
 
   return (

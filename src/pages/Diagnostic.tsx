@@ -257,10 +257,10 @@ export default function Diagnostic() {
     const startedAt = new Date(resumeOffer.startedAt).toLocaleString();
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 max-w-md w-full">
           <div className="text-3xl mb-3">↻</div>
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Resume your diagnostic?</h2>
-          <p className="text-sm text-slate-500 mb-6">
+          <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Resume your diagnostic?</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
             You were on item {resumeOffer.currentIndex + 1} of {resumeOffer.itemIds.length}. Started {startedAt}.
           </p>
           <div className="flex flex-col gap-2">
@@ -272,11 +272,11 @@ export default function Diagnostic() {
             </button>
             <button
               onClick={() => { saveResumableDiagnostic(null); setResumeOffer(null); setPhase('intro'); }}
-              className="py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50"
+              className="py-2.5 rounded-2xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700"
             >
               Restart from scratch
             </button>
-            <button onClick={discardResume} className="py-2 text-slate-400 text-sm hover:text-slate-600">
+            <button onClick={discardResume} className="py-2 text-slate-400 text-sm hover:text-slate-600 dark:hover:text-slate-300">
               Discard and go to dashboard
             </button>
           </div>
@@ -292,23 +292,23 @@ export default function Diagnostic() {
           <div className="bg-white rounded-3xl shadow-2xl p-8">
             <div className="text-center mb-6">
               <div className="text-4xl mb-3">🎯</div>
-              <h1 className="text-2xl font-bold text-slate-800 mb-2">
+              <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">
                 Adaptive {pack.metadata.label} placement
               </h1>
-              <p className="text-slate-500 text-sm leading-relaxed">
+              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
                 {pack.metadata.promptCopy.diagnosticIntro}
               </p>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl p-4 mb-5 space-y-2 text-sm text-slate-600">
+            <div className="bg-slate-50 dark:bg-slate-700 rounded-2xl p-4 mb-5 space-y-2 text-sm text-slate-600 dark:text-slate-300">
               <div className="flex items-center gap-2"><span className="text-emerald-500">✓</span> 5–10 minutes</div>
               <div className="flex items-center gap-2"><span className="text-emerald-500">✓</span> Starts at A1 — only climbs if you show you are ready</div>
               <div className="flex items-center gap-2"><span className="text-emerald-500">✓</span> Skip any item — skips lower confidence, never inflates your level</div>
               <div className="flex items-center gap-2"><span className="text-amber-500">ℹ</span> Estimates are unofficial — not a substitute for certified testing</div>
             </div>
 
-            <label className="flex items-center justify-between bg-slate-50 rounded-xl px-4 py-3 mb-5">
-              <span className="text-sm text-slate-700">
+            <label className="flex items-center justify-between bg-slate-50 dark:bg-slate-700 rounded-xl px-4 py-3 mb-5">
+              <span className="text-sm text-slate-700 dark:text-slate-200">
                 Include a short writing prompt?
                 <span className="block text-[11px] text-slate-400">Skipping is fine — productive-skill confidence will be lower.</span>
               </span>
@@ -328,7 +328,7 @@ export default function Diagnostic() {
             </button>
             <button
               onClick={() => navigate('/')}
-              className="w-full py-2.5 rounded-2xl text-slate-400 text-sm hover:text-slate-600 transition-colors"
+              className="w-full py-2.5 rounded-2xl text-slate-400 text-sm hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
             >
               Skip — I'll do this later
             </button>
@@ -343,8 +343,8 @@ export default function Diagnostic() {
       <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-8 text-center max-w-sm w-full">
           <div className="text-5xl mb-4">📊</div>
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Diagnostic complete!</h2>
-          <p className="text-slate-500 text-sm">Showing your placement report…</p>
+          <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Diagnostic complete!</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Showing your placement report…</p>
         </div>
       </div>
     );
@@ -355,10 +355,10 @@ export default function Diagnostic() {
   const progress = ((currentIndex) / diagnosticItems.length) * 100;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="bg-white border-b border-slate-100 px-4 py-3">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <div className="bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="text-sm font-medium text-slate-500">
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
             Diagnostic — {currentIndex + 1} of {diagnosticItems.length}
           </div>
           <div className="flex items-center gap-3">
@@ -369,7 +369,7 @@ export default function Diagnostic() {
           </div>
         </div>
         <div className="max-w-2xl mx-auto mt-2">
-          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
             <div
               className="h-full bg-indigo-500 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
@@ -393,11 +393,11 @@ export default function Diagnostic() {
 
 function levelChip(level: string): string {
   switch (level) {
-    case 'A1': return 'bg-emerald-100 text-emerald-700';
-    case 'A2': return 'bg-emerald-100 text-emerald-700';
-    case 'B1': return 'bg-sky-100 text-sky-700';
-    case 'B2': return 'bg-indigo-100 text-indigo-700';
-    case 'C1': return 'bg-amber-100 text-amber-700';
-    default: return 'bg-slate-100 text-slate-700';
+    case 'A1': return 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300';
+    case 'A2': return 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300';
+    case 'B1': return 'bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300';
+    case 'B2': return 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300';
+    case 'C1': return 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300';
+    default: return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300';
   }
 }

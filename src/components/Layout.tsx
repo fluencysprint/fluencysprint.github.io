@@ -15,7 +15,7 @@ function SaveIndicator() {
   if (!label) return null;
   const color =
     status.kind === 'error' ? 'text-red-500' :
-    status.kind === 'saving' ? 'text-slate-400' : 'text-emerald-500';
+    status.kind === 'saving' ? 'text-slate-400 dark:text-slate-500' : 'text-emerald-500';
   return (
     <span className={`text-[10px] font-medium ${color}`} data-testid="save-indicator">
       {label}
@@ -52,7 +52,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         `flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors
         ${isActive
           ? 'bg-indigo-600 text-white'
-          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'
+          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-white'
         }
         ${mobile ? 'w-full' : ''}`
       }
@@ -66,22 +66,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   if (isFullscreen) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
         {children}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex">
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex flex-col w-52 shrink-0 bg-white border-r border-slate-100 pt-6 pb-4 px-3 gap-1">
+      <aside className="hidden md:flex flex-col w-52 shrink-0 bg-white dark:bg-slate-800 border-r border-slate-100 dark:border-slate-700 pt-6 pb-4 px-3 gap-1">
         <div className="px-3 mb-5">
-          <div className="text-base font-bold text-slate-800">Fluency Sprint</div>
-          <div className="text-xs text-slate-400 leading-snug">{pack?.metadata.label ?? ''} · A1 → C1</div>
+          <div className="text-base font-bold text-slate-800 dark:text-white">Fluency Sprint</div>
+          <div className="text-xs text-slate-400 dark:text-slate-400 leading-snug">{pack?.metadata.label ?? ''} · A1 → C1</div>
           {profile && (
             <div
-              className="mt-1.5 text-xs text-indigo-600 font-medium truncate"
+              className="mt-1.5 text-xs text-indigo-600 dark:text-indigo-400 font-medium truncate"
               title={profile.displayName ? `${pack?.metadata.label} · ${profile.displayName}` : pack?.metadata.label}
             >
               {profile.displayName ? profile.displayName : 'Default profile'}
@@ -93,14 +93,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 px-4 py-3 flex items-center justify-between">
         <div className="min-w-0 flex-1 mr-2">
           <div className="flex items-center gap-2">
-            <div className="text-sm font-bold text-slate-800">Fluency Sprint</div>
+            <div className="text-sm font-bold text-slate-800 dark:text-white">Fluency Sprint</div>
             <SaveIndicator />
           </div>
           {profile && (
-            <div className="text-[10px] text-indigo-600 truncate" title={profile.displayName ?? pack?.metadata.label}>
+            <div className="text-[10px] text-indigo-600 dark:text-indigo-400 truncate" title={profile.displayName ?? pack?.metadata.label}>
               {pack?.metadata.label ?? ''}
               {profile.displayName ? ` · ${profile.displayName}` : ''}
             </div>
@@ -108,7 +108,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2 rounded-lg text-slate-500 hover:bg-slate-100"
+          className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
         >
           {mobileOpen ? '✕' : '☰'}
@@ -118,7 +118,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-30" onClick={() => setMobileOpen(false)}>
-          <div className="absolute inset-y-0 left-0 w-56 bg-white shadow-xl pt-16 px-3 pb-4" onClick={e => e.stopPropagation()}>
+          <div className="absolute inset-y-0 left-0 w-56 bg-white dark:bg-slate-800 shadow-xl pt-16 px-3 pb-4" onClick={e => e.stopPropagation()}>
             {navItems.map(item => navLink(item, true))}
           </div>
         </div>

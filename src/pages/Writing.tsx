@@ -156,19 +156,19 @@ export default function Writing() {
     return (
       <div className="space-y-6 pb-10">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Writing practice</h1>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Writing practice</h1>
           <p className="text-slate-400 text-sm mt-1">
             {pack.metadata.label} timed writing with rule-based analysis · skip any time
           </p>
         </div>
 
         {recentEntries.length > 0 && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-4">
             <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-2">Recent writing</div>
             <div className="space-y-1.5">
               {recentEntries.map(e => (
                 <div key={e.id} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600 truncate mr-2">
+                  <span className="text-slate-600 dark:text-slate-300 truncate mr-2">
                     {pack.writingPrompts.find(p => p.id === e.promptId)?.title ?? e.promptId}
                   </span>
                   <span className="text-xs text-slate-400 shrink-0">
@@ -182,7 +182,7 @@ export default function Writing() {
 
         {(['5min', '10min', '20min'] as const).map(mode => (
           <div key={mode}>
-            <div className="text-sm font-semibold text-slate-700 mb-2">
+            <div className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
               {mode === '5min' ? '5 minutes — micro writing'
                 : mode === '10min' ? '10 minutes — structured answer'
                 : '20 minutes — exam-style answer'}
@@ -195,18 +195,18 @@ export default function Writing() {
                   <button
                     key={p.id}
                     onClick={() => startWriting(p)}
-                    className="w-full text-left bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:border-indigo-300 hover:shadow-md transition-all"
+                    className="w-full text-left bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-4 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-md transition-all"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <div className="text-sm font-semibold text-slate-800">{p.title}</div>
+                        <div className="text-sm font-semibold text-slate-800 dark:text-white">{p.title}</div>
                         <div className="text-xs text-slate-400 mt-0.5">{p.genre} · {p.wordTarget}</div>
                       </div>
-                      <span className="text-xs px-2 py-0.5 rounded-full font-medium shrink-0 bg-indigo-100 text-indigo-700">
+                      <span className="text-xs px-2 py-0.5 rounded-full font-medium shrink-0 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
                         {p.cefrLevel}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 mt-2 line-clamp-2">{p.prompt}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">{p.prompt}</p>
                   </button>
                 ))}
               </div>
@@ -226,7 +226,7 @@ export default function Writing() {
       <div className="space-y-5 pb-10">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-sm font-semibold text-slate-700">{selectedPrompt.title}</div>
+            <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">{selectedPrompt.title}</div>
             <div className="text-xs text-slate-400">{selectedPrompt.genre} · {selectedPrompt.cefrLevel}</div>
           </div>
           <div className={`text-sm font-mono font-bold ${overtime ? 'text-red-500' : 'text-slate-600'}`}>
@@ -234,14 +234,14 @@ export default function Writing() {
           </div>
         </div>
 
-        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
           <div className={`h-full rounded-full transition-all duration-1000 ${overtime ? 'bg-red-400' : 'bg-indigo-500'}`} style={{ width: `${pct}%` }} />
         </div>
 
-        <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
-          <div className="text-xs font-semibold text-indigo-400 uppercase tracking-wide mb-2">Task</div>
-          <p className="text-sm text-slate-700 leading-relaxed">{selectedPrompt.prompt}</p>
-          <div className="mt-2 text-xs text-indigo-500">💡 {selectedPrompt.tip}</div>
+        <div className="bg-indigo-50 dark:bg-indigo-900/40 rounded-xl p-4 border border-indigo-100 dark:border-indigo-800">
+          <div className="text-xs font-semibold text-indigo-400 dark:text-indigo-300 uppercase tracking-wide mb-2">Task</div>
+          <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">{selectedPrompt.prompt}</p>
+          <div className="mt-2 text-xs text-indigo-500 dark:text-indigo-400">💡 {selectedPrompt.tip}</div>
         </div>
 
         <LanguageInput
@@ -268,7 +268,7 @@ export default function Writing() {
           </button>
           <button
             onClick={() => setPhase('select')}
-            className="px-4 py-3.5 rounded-xl border border-slate-200 text-slate-500 text-sm font-medium hover:bg-slate-50"
+            className="px-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700"
           >
             Back
           </button>
@@ -281,7 +281,7 @@ export default function Writing() {
     return (
       <div className="space-y-5 pb-10">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Writing analysis</h2>
+          <h2 className="text-xl font-bold text-slate-800 dark:text-white">Writing analysis</h2>
           <p className="text-slate-400 text-sm mt-1">{selectedPrompt.title}</p>
         </div>
 
@@ -311,13 +311,13 @@ export default function Writing() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Writing saved!</h1>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Writing saved!</h1>
         </div>
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center">
+        <div className="bg-emerald-50 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-700 rounded-2xl p-6 text-center">
           <div className="text-4xl mb-3">✓</div>
-          <div className="text-lg font-bold text-slate-800">Good work!</div>
+          <div className="text-lg font-bold text-slate-800 dark:text-white">Good work!</div>
           {analysis && (
-            <p className="text-sm text-slate-500 mt-2">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
               Score: <span className="font-semibold">{analysis.score}/100</span> · {analysis.bandLabel}
             </p>
           )}

@@ -1,7 +1,21 @@
 @import "tailwindcss";
 
+/* Class-based dark mode — activated by adding .dark to <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* CSS variables for components that rely on inline styles (e.g. WeaknessHeatmap) */
+:root {
+  --heat-empty-bg: #f1f5f9;
+  --heat-empty-text: #94a3b8;
+}
+.dark {
+  --heat-empty-bg: #1e293b;
+  --heat-empty-text: #64748b;
+  color-scheme: dark;
 }
 
 * {
@@ -37,6 +51,9 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
 }
 
 :focus-visible {

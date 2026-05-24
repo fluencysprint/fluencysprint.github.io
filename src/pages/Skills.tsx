@@ -40,15 +40,15 @@ export default function Skills() {
   return (
     <div className="space-y-6 pb-10">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Skill map</h1>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Skill map</h1>
         <p className="text-slate-400 text-sm mt-1">
           {pack.metadata.label} — proficiency evidence vs. practice score
         </p>
       </div>
 
       {!hasEvidence && (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 text-center">
-          <p className="text-sm text-slate-600 mb-3">Take the placement diagnostic to populate your skill estimates.</p>
+        <div className="bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-700 rounded-2xl p-5 text-center">
+          <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">Take the placement diagnostic to populate your skill estimates.</p>
           <button
             onClick={() => navigate('/diagnostic')}
             className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
@@ -72,10 +72,10 @@ export default function Skills() {
             ? 'Early signal:'
             : 'Main issue:';
           return (
-            <div key={s.skill} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col gap-3" data-testid={`skill-${s.skill}`}>
+            <div key={s.skill} className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-4 flex flex-col gap-3" data-testid={`skill-${s.skill}`}>
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="text-sm font-semibold text-slate-800">{SKILL_LABELS[s.skill]}</div>
+                  <div className="text-sm font-semibold text-slate-800 dark:text-white">{SKILL_LABELS[s.skill]}</div>
                   {notEnough ? (
                     <div className="text-xs text-slate-400 mt-0.5">Not enough data yet</div>
                   ) : (
@@ -86,7 +86,7 @@ export default function Skills() {
                   <ProgressRing pct={s.proficiency ?? 0} size={56} stroke={5} color={ringColor} label={`${s.proficiency}`} />
                 )}
               </div>
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-slate-500 dark:text-slate-400">
                 Practice score: {s.practiceScore !== null ? `${s.practiceScore}%` : '—'}
               </div>
               <div className="text-[11px] text-slate-400">
@@ -94,7 +94,7 @@ export default function Skills() {
                 {skillMistakeCounts[s.skill] ? ` · ${skillMistakeCounts[s.skill]} due` : ''}
               </div>
               {topLabel && (
-                <div className="text-xs text-slate-500 bg-slate-50 rounded-lg px-2 py-1.5">
+                <div className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 rounded-lg px-2 py-1.5">
                   {mistakePrefix} {topLabel}
                 </div>
               )}
@@ -103,7 +103,7 @@ export default function Skills() {
               )}
               <button
                 onClick={() => navigate('/sprint')}
-                className="w-full mt-1 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-medium hover:bg-indigo-100"
+                className="w-full mt-1 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/60"
               >
                 Start drill
               </button>
@@ -111,15 +111,15 @@ export default function Skills() {
           );
         })}
         {COMING_SOON_SKILLS.map(skill => (
-          <div key={skill} className="bg-slate-50 rounded-2xl border border-slate-200 p-4 flex flex-col gap-2" data-testid={`skill-${skill}`}>
-            <div className="text-sm font-semibold text-slate-700">{SKILL_LABELS[skill]}</div>
+          <div key={skill} className="bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col gap-2" data-testid={`skill-${skill}`}>
+            <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">{SKILL_LABELS[skill]}</div>
             <div className="text-xs text-slate-400">Coming soon — not included in level scoring yet.</div>
           </div>
         ))}
       </div>
 
       <div>
-        <h2 className="text-base font-bold text-slate-800 mb-3">CEFR readiness</h2>
+        <h2 className="text-base font-bold text-slate-800 dark:text-white mb-3">CEFR readiness</h2>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {proficiency.readinessByLevel.map(lr => (
             <LevelReadinessCard key={lr.level} data={lr} isCurrent={lr.level === proficiency.currentEstimate} />

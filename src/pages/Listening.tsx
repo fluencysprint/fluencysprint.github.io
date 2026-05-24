@@ -6,14 +6,14 @@ export default function Listening() {
   return (
     <div className="space-y-6 pb-10">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Listening</h1>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Listening</h1>
         <p className="text-slate-400 text-sm mt-1">Targeted listening practice — coming soon</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 text-center">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-8 text-center">
         <div className="text-5xl mb-4">🎧</div>
-        <h2 className="text-lg font-bold text-slate-800 mb-2">Coming soon</h2>
-        <p className="text-sm text-slate-500 leading-relaxed max-w-md mx-auto">
+        <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Coming soon</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-md mx-auto">
           A focused listening module — natural-pace dialogues, gap-fill transcripts and skim/scan tasks — is on the roadmap. The current MVP focuses on placement, reading, grammar, vocabulary, writing and adaptive review.
         </p>
         <p className="text-xs text-slate-400 mt-3">

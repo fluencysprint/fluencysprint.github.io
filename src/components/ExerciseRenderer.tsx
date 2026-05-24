@@ -197,8 +197,8 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
 
       {/* Reading text */}
       {readingText && (
-        <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-700 leading-relaxed border border-slate-200">
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">
+        <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-4 text-sm text-slate-700 dark:text-slate-200 leading-relaxed border border-slate-200 dark:border-slate-600">
+          <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2">
             {readingText.title}
           </div>
           <p className="whitespace-pre-wrap">{readingText.text}</p>
@@ -207,8 +207,8 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
 
       {/* Inline listening / context */}
       {exercise.context && !readingText && (
-        <div className="bg-indigo-50 rounded-xl p-4 text-sm text-slate-700 leading-relaxed border border-indigo-100">
-          <div className="text-xs font-semibold text-indigo-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+        <div className="bg-indigo-50 dark:bg-indigo-900/40 rounded-xl p-4 text-sm text-slate-700 dark:text-slate-200 leading-relaxed border border-indigo-100 dark:border-indigo-800">
+          <div className="text-xs font-semibold text-indigo-400 dark:text-indigo-300 uppercase tracking-wide mb-2 flex items-center gap-2">
             <span>🎧</span> Listen &amp; understand
           </div>
           <p className="whitespace-pre-wrap">{exercise.context}</p>
@@ -216,13 +216,13 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
       )}
 
       {/* Prompt */}
-      <div className="text-base font-medium text-slate-800 leading-relaxed whitespace-pre-wrap">
+      <div className="text-base font-medium text-slate-800 dark:text-slate-100 leading-relaxed whitespace-pre-wrap">
         {exercise.prompt}
       </div>
 
       {/* Heuristic disclosure for subjective during diagnostic */}
       {isWriting && !submitted && (
-        <div className="text-xs text-slate-400 bg-slate-50 rounded-lg px-3 py-2 border border-slate-100">
+        <div className="text-xs text-slate-400 bg-slate-50 dark:bg-slate-700 rounded-lg px-3 py-2 border border-slate-100 dark:border-slate-600">
           This is a subjective task. Your answer is preserved and analyzed locally with a
           rule-based evaluator. For official scoring, use a teacher or mock exam.
         </div>
@@ -230,9 +230,9 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
 
       {/* Register rewrite instructions and checklist */}
       {exercise.type === 'registerRewrite' && !submitted && (
-        <div className="bg-sky-50 rounded-xl p-4 border border-sky-100 space-y-3" data-testid="rewrite-instructions">
-          <div className="text-xs font-semibold text-sky-600 uppercase tracking-wide">How to answer</div>
-          <ul className="space-y-1.5 text-sm text-slate-700">
+        <div className="bg-sky-50 dark:bg-sky-900/40 rounded-xl p-4 border border-sky-100 dark:border-sky-800 space-y-3" data-testid="rewrite-instructions">
+          <div className="text-xs font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide">How to answer</div>
+          <ul className="space-y-1.5 text-sm text-slate-700 dark:text-slate-200">
             <li>• Rewrite the sentence in a more formal and professional way.</li>
             <li>• Keep the same meaning.</li>
             <li>• Use one polite sentence.</li>
@@ -241,9 +241,9 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
             )}
           </ul>
           {exercise.checklist && exercise.checklist.length > 0 && (
-            <div className="pt-2 border-t border-sky-100">
-              <div className="text-xs font-semibold text-sky-600 uppercase tracking-wide mb-2">Before you submit, check:</div>
-              <ul className="space-y-1.5 text-sm text-slate-700">
+            <div className="pt-2 border-t border-sky-100 dark:border-sky-800">
+              <div className="text-xs font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide mb-2">Before you submit, check:</div>
+              <ul className="space-y-1.5 text-sm text-slate-700 dark:text-slate-200">
                 {exercise.checklist.map((item, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <span className="text-sky-400 shrink-0">□</span>
@@ -269,8 +269,8 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
               className={`w-full text-left px-4 py-3 rounded-xl border-2 transition-all text-sm font-medium
                 ${
                   selected === choice
-                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:bg-indigo-50/30'
+                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-200'
+                    : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-indigo-50/30 dark:hover:bg-indigo-900/20'
                 }`}
             >
               {choice}
@@ -325,7 +325,7 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
             <button
               type="button"
               onClick={onSkip}
-              className="px-4 py-3 rounded-xl border border-slate-200 text-slate-500 text-sm font-medium hover:bg-slate-50 transition-colors"
+              className="px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
             >
               Skip
             </button>
@@ -351,12 +351,12 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
         <div
           data-testid="exercise-feedback"
           className={`rounded-xl p-4 ${
-            result.correct ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'
+            result.correct ? 'bg-emerald-50 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-700' : 'bg-red-50 dark:bg-red-900/40 border border-red-200 dark:border-red-700'
           }`}
         >
           <div
             className={`font-semibold text-sm mb-1 ${
-              result.correct ? 'text-emerald-700' : 'text-red-700'
+              result.correct ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300'
             }`}
           >
             {result.correct
@@ -365,10 +365,10 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
                 : '✓ Correct!'
               : `✗ Incorrect — correct answer: ${exercise.correctAnswer}`}
           </div>
-          <p className="text-sm text-slate-600 leading-relaxed">{exercise.explanation}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{exercise.explanation}</p>
 
           {isMultipleChoice && !result.correct && selected && (
-            <div className="mt-2 text-xs text-red-600">Your answer: {selected}</div>
+            <div className="mt-2 text-xs text-red-600 dark:text-red-400">Your answer: {selected}</div>
           )}
 
           {isMultipleChoice && (
@@ -380,9 +380,9 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
                   <div
                     key={choice}
                     className={`px-3 py-2 rounded-lg text-sm
-                      ${isCorrect ? 'bg-emerald-100 text-emerald-800 font-medium' : ''}
-                      ${wasSelected && !isCorrect ? 'bg-red-100 text-red-700' : ''}
-                      ${!isCorrect && !wasSelected ? 'text-slate-400' : ''}
+                      ${isCorrect ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 font-medium' : ''}
+                      ${wasSelected && !isCorrect ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300' : ''}
+                      ${!isCorrect && !wasSelected ? 'text-slate-400 dark:text-slate-500' : ''}
                     `}
                   >
                     {isCorrect ? '✓ ' : wasSelected ? '✗ ' : ''}
@@ -397,8 +397,8 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
 
       {/* Confidence (objective only) */}
       {submitted && isObjective && confidence === null && (
-        <div className="bg-slate-50 rounded-xl p-4 border border-slate-200" data-testid="confidence-prompt">
-          <div className="text-sm font-medium text-slate-700 mb-3">How confident did you feel?</div>
+        <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700" data-testid="confidence-prompt">
+          <div className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-3">How confident did you feel?</div>
           <div className="flex gap-2">
             {(['low', 'medium', 'high'] as const).map(level => (
               <button
@@ -406,9 +406,9 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
                 type="button"
                 onClick={() => handleConfirm(level)}
                 className={`flex-1 py-2 rounded-xl text-sm font-semibold capitalize transition-colors
-                  ${level === 'low' ? 'bg-red-100 text-red-700 hover:bg-red-200' : ''}
-                  ${level === 'medium' ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : ''}
-                  ${level === 'high' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : ''}
+                  ${level === 'low' ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/60' : ''}
+                  ${level === 'medium' ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/60' : ''}
+                  ${level === 'high' ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/60' : ''}
                 `}
               >
                 {level}

@@ -214,14 +214,14 @@ export default function Sprint() {
   if (phase === 'resume_prompt' && resumeOffer) {
     return (
       <div className="space-y-4">
-        <div className="bg-white border border-slate-100 rounded-2xl p-6">
-          <h2 className="text-lg font-bold text-slate-800 mb-2">Resume your sprint?</h2>
-          <p className="text-sm text-slate-500 mb-4">
+        <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl p-6">
+          <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Resume your sprint?</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
             You were on item {resumeOffer.currentIndex + 1} of {resumeOffer.itemIds.length}.
           </p>
           <div className="flex gap-2">
             <button onClick={() => resumeFromState(resumeOffer)} className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700">Resume</button>
-            <button onClick={() => { saveResumableSprint(null); setResumeOffer(null); setPhase('select'); }} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50">Restart</button>
+            <button onClick={() => { saveResumableSprint(null); setResumeOffer(null); setPhase('select'); }} className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold hover:bg-slate-50 dark:hover:bg-slate-700">Restart</button>
             <button onClick={() => { saveResumableSprint(null); setResumeOffer(null); navigate('/'); }} className="px-3 py-2.5 text-slate-400 text-sm">Discard</button>
           </div>
         </div>
@@ -233,14 +233,14 @@ export default function Sprint() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Daily Sprint</h1>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Daily Sprint</h1>
           <p className="text-slate-400 text-sm mt-1">
             {pack.metadata.label} · adaptive to your weak areas
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
-          <div className="text-sm font-semibold text-slate-700">Choose duration:</div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-6 space-y-4">
+          <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">Choose duration:</div>
           <div className="grid grid-cols-3 gap-3">
             {([5, 10, 20] as const).map(mins => (
               <button
@@ -248,8 +248,8 @@ export default function Sprint() {
                 onClick={() => setDurationMins(mins)}
                 className={`py-3 rounded-xl border-2 text-sm font-semibold transition-all
                   ${durationMins === mins
-                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                    : 'border-slate-200 text-slate-600 hover:border-indigo-200'
+                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-200'
+                    : 'border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-200 dark:hover:border-indigo-500'
                   }`}
               >
                 {mins} min
@@ -257,7 +257,7 @@ export default function Sprint() {
             ))}
           </div>
 
-          <div className="pt-2 text-sm text-slate-500 space-y-1">
+          <div className="pt-2 text-sm text-slate-500 dark:text-slate-400 space-y-1">
             <div>~50% from your weakest skill areas</div>
             <div>~25% due mistake reviews</div>
             <div>~25% mixed practice</div>
@@ -284,15 +284,15 @@ export default function Sprint() {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <div className="text-sm font-medium text-slate-500">Sprint — {currentIndex + 1}/{queue.length}</div>
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400">Sprint — {currentIndex + 1}/{queue.length}</div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-400 capitalize">{exercise.skill.replace('_', ' ')}</span>
-            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-indigo-100 text-indigo-700">
+            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
               {exercise.cefrLevel}
             </span>
           </div>
         </div>
-        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
           <div className="h-full bg-indigo-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
         </div>
         <ExerciseRenderer
@@ -325,18 +325,18 @@ export default function Sprint() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Sprint complete!</h1>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Sprint complete!</h1>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-4 text-center">
           <div className="text-3xl font-bold text-indigo-600">{percentOf(correct, attempted || 1)}%</div>
           <div className="text-xs text-slate-400 mt-1">Accuracy</div>
         </div>
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 text-center">
-          <div className="text-3xl font-bold text-slate-800">{attempted}</div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-4 text-center">
+          <div className="text-3xl font-bold text-slate-800 dark:text-white">{attempted}</div>
           <div className="text-xs text-slate-400 mt-1">Items</div>
         </div>
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-4 text-center">
           <div className="text-3xl font-bold text-emerald-600">{Math.round((Date.now() - startRef.current) / 60000)}m</div>
           <div className="text-xs text-slate-400 mt-1">Time</div>
         </div>
@@ -350,7 +350,7 @@ export default function Sprint() {
         </button>
         <button
           onClick={() => navigate('/')}
-          className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50"
+          className="flex-1 py-3 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-50 dark:hover:bg-slate-700"
         >
           Dashboard
         </button>

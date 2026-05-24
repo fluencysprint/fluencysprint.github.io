@@ -80,11 +80,11 @@ export default function Dashboard() {
   return (
     <div className="space-y-6 pb-10" data-testid="dashboard">
       {noticeOpen && (
-        <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 flex items-start justify-between gap-3" data-testid="migration-notice">
-          <div className="text-sm text-sky-900">
+        <div className="bg-sky-50 dark:bg-sky-900/40 border border-sky-200 dark:border-sky-700 rounded-2xl p-4 flex items-start justify-between gap-3" data-testid="migration-notice">
+          <div className="text-sm text-sky-900 dark:text-sky-100">
             Your progress was upgraded to a stricter scoring model. Some readiness estimates may change.
           </div>
-          <button onClick={dismissNotice} className="text-sky-600 text-sm font-semibold shrink-0 hover:text-sky-800">
+          <button onClick={dismissNotice} className="text-sky-600 dark:text-sky-400 text-sm font-semibold shrink-0 hover:text-sky-800 dark:hover:text-sky-200">
             Dismiss
           </button>
         </div>
@@ -92,7 +92,7 @@ export default function Dashboard() {
 
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Dashboard</h1>
           <p className="text-slate-400 text-sm mt-1">
             {pack.metadata.label}
             {profile.displayName ? ` · ${profile.displayName}` : ''} · target {profile.targetLevel}
@@ -107,10 +107,10 @@ export default function Dashboard() {
       </div>
 
       {showDiagnosticPrompt && (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-6 text-center">
+        <div className="bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-700 rounded-2xl p-6 text-center">
           <div className="text-4xl mb-3">🎯</div>
-          <h3 className="text-lg font-bold text-slate-800 mb-1">Take the placement diagnostic</h3>
-          <p className="text-slate-500 text-sm mb-4">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-1">Take the placement diagnostic</h3>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">
             A 5–10 minute adaptive check that starts at A1 and only goes higher if your answers support it.
           </p>
           <Link
@@ -124,15 +124,15 @@ export default function Dashboard() {
 
       {/* Current estimate + today */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-5">
           <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-3">CEFR estimate (evidence-based)</div>
           <div className="flex items-center gap-4">
             <ProgressRing pct={currentRing} size={72} stroke={7} color="#6366f1" label={currentLevel} />
             <div>
-              <div className="text-2xl font-bold text-slate-800">{headline}</div>
+              <div className="text-2xl font-bold text-slate-800 dark:text-white">{headline}</div>
               <div className="text-xs text-slate-400 mt-1">{confidenceLabel}</div>
               {proficiency.nextTarget && (
-                <div className="text-xs text-indigo-600 font-medium mt-1">
+                <div className="text-xs text-indigo-600 dark:text-indigo-400 font-medium mt-1">
                   Next target: {proficiency.nextTarget}
                 </div>
               )}
@@ -160,7 +160,7 @@ export default function Dashboard() {
 
       {/* CEFR readiness — conservative, evidence-based */}
       <div>
-        <h2 className="text-base font-bold text-slate-800 mb-3">CEFR readiness</h2>
+        <h2 className="text-base font-bold text-slate-800 dark:text-white mb-3">CEFR readiness</h2>
         <p className="text-xs text-slate-400 mb-3">
           Based on unseen calibrated evidence. Repeated items and reviews don't raise your level.
         </p>
@@ -172,7 +172,7 @@ export default function Dashboard() {
       </div>
 
       {/* Evidence quality */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5" data-testid="evidence-quality">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-5" data-testid="evidence-quality">
         <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-3">Evidence quality</div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
@@ -188,12 +188,12 @@ export default function Dashboard() {
             <div className="text-xs text-slate-400 mt-1">Writing samples</div>
           </div>
           <div>
-            <div className="text-xl font-bold text-slate-700">{EVIDENCE_CONFIDENCE_LABELS[q.latestConfidence]}</div>
+            <div className="text-xl font-bold text-slate-700 dark:text-slate-200">{EVIDENCE_CONFIDENCE_LABELS[q.latestConfidence]}</div>
             <div className="text-xs text-slate-400 mt-1">Latest estimate confidence</div>
           </div>
         </div>
         {q.levelsWithInsufficientEvidence.length > 0 && (
-          <div className="text-xs text-slate-500 mt-3">
+          <div className="text-xs text-slate-500 dark:text-slate-400 mt-3">
             Insufficient evidence at: {q.levelsWithInsufficientEvidence.join(', ')}
             {q.legacyItems > 0 && ` · ${q.legacyItems} legacy items preserved (low weight)`}
           </div>
@@ -203,18 +203,18 @@ export default function Dashboard() {
       {/* Recommendations + warnings */}
       {(proficiency.recommendedNextActions.length > 0 || proficiency.evidenceWarnings.length > 0) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-indigo-50 rounded-2xl border border-indigo-200 p-5">
-            <div className="text-xs text-indigo-600 uppercase tracking-wide font-semibold mb-2">Recommended next</div>
-            <ul className="text-sm text-indigo-900 space-y-1.5 leading-snug list-disc list-inside">
+          <div className="bg-indigo-50 dark:bg-indigo-900/40 rounded-2xl border border-indigo-200 dark:border-indigo-700 p-5">
+            <div className="text-xs text-indigo-600 dark:text-indigo-400 uppercase tracking-wide font-semibold mb-2">Recommended next</div>
+            <ul className="text-sm text-indigo-900 dark:text-indigo-100 space-y-1.5 leading-snug list-disc list-inside">
               {proficiency.recommendedNextActions.slice(0, 4).map((n, i) => <li key={i}>{n}</li>)}
             </ul>
           </div>
-          <div className="bg-amber-50 rounded-2xl border border-amber-200 p-5">
-            <div className="text-xs text-amber-600 uppercase tracking-wide font-semibold mb-2">Evidence notes</div>
+          <div className="bg-amber-50 dark:bg-amber-900/40 rounded-2xl border border-amber-200 dark:border-amber-700 p-5">
+            <div className="text-xs text-amber-600 dark:text-amber-400 uppercase tracking-wide font-semibold mb-2">Evidence notes</div>
             {proficiency.evidenceWarnings.length === 0 && proficiency.bottlenecks.length === 0 ? (
-              <div className="text-sm text-amber-900">Nothing flagged — keep building fresh evidence.</div>
+              <div className="text-sm text-amber-900 dark:text-amber-100">Nothing flagged — keep building fresh evidence.</div>
             ) : (
-              <ul className="text-sm text-amber-900 space-y-1.5 leading-snug list-disc list-inside">
+              <ul className="text-sm text-amber-900 dark:text-amber-100 space-y-1.5 leading-snug list-disc list-inside">
                 {[...proficiency.bottlenecks, ...proficiency.evidenceWarnings].slice(0, 4).map((n, i) => <li key={i}>{n}</li>)}
               </ul>
             )}
@@ -223,7 +223,7 @@ export default function Dashboard() {
       )}
 
       {/* Review due */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-5 flex items-center justify-between">
         <div>
           <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">Review due</div>
           <div className={`text-2xl font-bold ${dueMistakes.length > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
@@ -236,35 +236,35 @@ export default function Dashboard() {
         <button
           onClick={() => navigate('/review')}
           disabled={dueMistakes.length === 0}
-          className="px-4 py-2.5 rounded-xl bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 disabled:opacity-40"
+          className="px-4 py-2.5 rounded-xl bg-red-50 dark:bg-red-900/40 text-red-600 dark:text-red-300 text-sm font-semibold hover:bg-red-100 dark:hover:bg-red-900/60 disabled:opacity-40"
         >
           Review now →
         </button>
       </div>
 
       {/* Momentum — activity, not proficiency */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5" data-testid="momentum">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-5" data-testid="momentum">
         <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">Momentum</div>
         <p className="text-xs text-slate-400 mb-3">Activity and habit — separate from your CEFR readiness.</p>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
           <div className="text-center">
-            <div className="text-xl font-bold text-slate-800">{progress.totalMinutes}</div>
+            <div className="text-xl font-bold text-slate-800 dark:text-white">{progress.totalMinutes}</div>
             <div className="text-xs text-slate-400 mt-1">Minutes</div>
           </div>
           <div className="text-center">
-            <div className="text-xl font-bold text-slate-800">{progress.sessionCount}</div>
+            <div className="text-xl font-bold text-slate-800 dark:text-white">{progress.sessionCount}</div>
             <div className="text-xs text-slate-400 mt-1">Sessions</div>
           </div>
           <div className="text-center">
-            <div className="text-xl font-bold text-slate-800">{progress.streakDays}</div>
+            <div className="text-xl font-bold text-slate-800 dark:text-white">{progress.streakDays}</div>
             <div className="text-xs text-slate-400 mt-1">Day streak</div>
           </div>
           <div className="text-center">
-            <div className="text-xl font-bold text-slate-800">{reviewsCompleted}</div>
+            <div className="text-xl font-bold text-slate-800 dark:text-white">{reviewsCompleted}</div>
             <div className="text-xs text-slate-400 mt-1">Reviews</div>
           </div>
           <div className="text-center">
-            <div className="text-xl font-bold text-slate-800">
+            <div className="text-xl font-bold text-slate-800 dark:text-white">
               {recentAccuracy !== null ? `${recentAccuracy}%` : '—'}
             </div>
             <div className="text-xs text-slate-400 mt-1">Practice acc.</div>
@@ -279,9 +279,9 @@ export default function Dashboard() {
       {/* Listening / Speaking placeholders */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {(['listening', 'speaking'] as const).map(skill => (
-          <div key={skill} className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+          <div key={skill} className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4">
             <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">{skill}</div>
-            <div className="text-sm font-semibold text-slate-700">Coming soon</div>
+            <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">Coming soon</div>
             <div className="text-xs text-slate-400 mt-1">Not included in your level estimate yet.</div>
           </div>
         ))}
@@ -289,7 +289,7 @@ export default function Dashboard() {
 
       {/* Heatmap */}
       {Object.keys(mistakeCounts).length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-5">
           <div className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-3">Weakness heatmap</div>
           <p className="text-xs text-slate-400 mb-3">Based on tracked mistakes. Red = most errors.</p>
           <WeaknessHeatmap mistakeCounts={mistakeCounts} categories={langCategories} />

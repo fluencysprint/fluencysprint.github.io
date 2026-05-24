@@ -18,10 +18,10 @@ export default function SkillCard({
 }: Props) {
   if (comingSoon) {
     return (
-      <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 flex flex-col gap-2" data-testid={`skill-${skill}`}>
+      <div className="bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col gap-2" data-testid={`skill-${skill}`}>
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-sm font-semibold text-slate-700">{SKILL_LABELS[skill]}</div>
+            <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">{SKILL_LABELS[skill]}</div>
             <div className="text-xs text-slate-400 mt-0.5">Coming soon</div>
           </div>
         </div>
@@ -31,30 +31,30 @@ export default function SkillCard({
   }
   const ringColor = score >= 70 ? '#10b981' : score >= 50 ? '#6366f1' : '#f59e0b';
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col gap-3" data-testid={`skill-${skill}`}>
+    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-4 flex flex-col gap-3" data-testid={`skill-${skill}`}>
       <div className="flex items-start justify-between">
         <div>
-          <div className="text-sm font-semibold text-slate-800">{SKILL_LABELS[skill]}</div>
+          <div className="text-sm font-semibold text-slate-800 dark:text-white">{SKILL_LABELS[skill]}</div>
           <div className="text-xs text-slate-400 mt-0.5">Score {score}/100</div>
         </div>
         <ProgressRing pct={score} size={56} stroke={5} color={ringColor} label={`${score}`} />
       </div>
       <div className="flex items-center gap-3 flex-wrap">
         {dueReviews > 0 && (
-          <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium">
+          <span className="text-xs bg-amber-50 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full font-medium">
             {dueReviews} due
           </span>
         )}
       </div>
       {topMistake && (
-        <div className="text-xs text-slate-400 bg-slate-50 rounded-lg px-2 py-1.5">
+        <div className="text-xs text-slate-400 bg-slate-50 dark:bg-slate-700 rounded-lg px-2 py-1.5">
           Top error: {MISTAKE_LABELS[topMistake]}
         </div>
       )}
       {onDrill && (
         <button
           onClick={onDrill}
-          className="w-full mt-1 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-medium hover:bg-indigo-100"
+          className="w-full mt-1 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/60"
         >
           Start drill
         </button>

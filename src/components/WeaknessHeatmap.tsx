@@ -9,7 +9,7 @@ interface Props {
 }
 
 function heatColor(count: number, max: number): string {
-  if (max === 0 || count === 0) return '#f1f5f9';
+  if (max === 0 || count === 0) return 'var(--heat-empty-bg)';
   const ratio = count / max;
   if (ratio < 0.25) return '#fef3c7';
   if (ratio < 0.5) return '#fcd34d';
@@ -18,7 +18,7 @@ function heatColor(count: number, max: number): string {
 }
 
 function textColor(count: number, max: number): string {
-  if (max === 0 || count === 0) return '#94a3b8';
+  if (max === 0 || count === 0) return 'var(--heat-empty-text)';
   const ratio = count / max;
   return ratio >= 0.5 ? '#fff' : '#374151';
 }

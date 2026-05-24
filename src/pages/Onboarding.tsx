@@ -58,7 +58,7 @@ export default function Onboarding() {
         </div>
 
         {hasProfiles && step === 0 && (
-          <div className="bg-white rounded-3xl shadow-2xl p-6 mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-6 mb-4">
             <div className="text-xs text-indigo-500 font-semibold uppercase tracking-widest mb-2">
               Existing learners on this device
             </div>
@@ -69,10 +69,10 @@ export default function Onboarding() {
                   <button
                     key={p.id}
                     onClick={() => switchProfile(p.id)}
-                    className="w-full text-left flex items-center justify-between px-4 py-3 rounded-2xl border-2 border-slate-100 hover:border-indigo-300 hover:bg-indigo-50 transition-all"
+                    className="w-full text-left flex items-center justify-between px-4 py-3 rounded-2xl border-2 border-slate-100 dark:border-slate-600 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 transition-all"
                   >
                     <div>
-                      <div className="text-sm font-semibold text-slate-800">
+                      <div className="text-sm font-semibold text-slate-800 dark:text-white">
                         {p.displayName || 'Unnamed learner'}
                       </div>
                       <div className="text-xs text-slate-400">
@@ -99,14 +99,14 @@ export default function Onboarding() {
           ))}
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl p-7">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-7">
           <div className="text-xs text-indigo-500 font-semibold uppercase tracking-widest mb-2">
             Step {step + 1} of 4
           </div>
 
           {step === 0 && (
             <>
-              <h2 className="text-xl font-bold text-slate-800 mb-1">What language do you want to learn?</h2>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-1">What language do you want to learn?</h2>
               <p className="text-sm text-slate-400 mb-5">You can add more profiles later for other languages.</p>
               <div className="space-y-2.5">
                 {([
@@ -117,9 +117,9 @@ export default function Onboarding() {
                     key={opt.id}
                     onClick={() => setLanguage(opt.id)}
                     className={`w-full text-left px-4 py-3.5 rounded-2xl border-2 transition-all
-                      ${language === opt.id ? 'border-indigo-500 bg-indigo-50' : 'border-slate-100 hover:border-indigo-200'}`}
+                      ${language === opt.id ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/40' : 'border-slate-100 dark:border-slate-600 hover:border-indigo-200 dark:hover:border-indigo-500'}`}
                   >
-                    <div className={`text-sm font-semibold ${language === opt.id ? 'text-indigo-700' : 'text-slate-800'}`}>
+                    <div className={`text-sm font-semibold ${language === opt.id ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-100'}`}>
                       {opt.label}
                     </div>
                     <div className="text-xs text-slate-400">{opt.native}</div>
@@ -133,7 +133,7 @@ export default function Onboarding() {
                   value={displayName}
                   onChange={e => setDisplayName(e.target.value)}
                   placeholder="e.g. Main profile or Beginner learner"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 />
                 <div className="text-[11px] text-slate-400 mt-1">
                   Useful if you share this device with someone else.
@@ -144,7 +144,7 @@ export default function Onboarding() {
 
           {step === 1 && (
             <>
-              <h2 className="text-xl font-bold text-slate-800 mb-1">What is your current level?</h2>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-1">What is your current level?</h2>
               <p className="text-sm text-slate-400 mb-5">Be honest — the diagnostic will calibrate from here.</p>
               <div className="space-y-2.5">
                 {([
@@ -159,9 +159,9 @@ export default function Onboarding() {
                     key={opt.v}
                     onClick={() => setSelfLevel(opt.v)}
                     className={`w-full text-left px-4 py-3 rounded-2xl border-2 transition-all
-                      ${selfLevel === opt.v ? 'border-indigo-500 bg-indigo-50' : 'border-slate-100 hover:border-indigo-200'}`}
+                      ${selfLevel === opt.v ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/40' : 'border-slate-100 dark:border-slate-600 hover:border-indigo-200 dark:hover:border-indigo-500'}`}
                   >
-                    <div className={`text-sm font-semibold ${selfLevel === opt.v ? 'text-indigo-700' : 'text-slate-800'}`}>
+                    <div className={`text-sm font-semibold ${selfLevel === opt.v ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-100'}`}>
                       {opt.label}
                     </div>
                     <div className="text-xs text-slate-400">{opt.desc}</div>
@@ -173,7 +173,7 @@ export default function Onboarding() {
 
           {step === 2 && (
             <>
-              <h2 className="text-xl font-bold text-slate-800 mb-1">What is your goal?</h2>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-1">What is your goal?</h2>
               <p className="text-sm text-slate-400 mb-5">This sets your readiness target and practice focus.</p>
               <div className="space-y-2.5">
                 {(['A2', 'B1', 'B2', 'C1'] as const).map(lvl => (
@@ -181,9 +181,9 @@ export default function Onboarding() {
                     key={lvl}
                     onClick={() => setTargetLevel(lvl)}
                     className={`w-full text-left px-4 py-3 rounded-2xl border-2 transition-all
-                      ${targetLevel === lvl ? 'border-indigo-500 bg-indigo-50' : 'border-slate-100 hover:border-indigo-200'}`}
+                      ${targetLevel === lvl ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/40' : 'border-slate-100 dark:border-slate-600 hover:border-indigo-200 dark:hover:border-indigo-500'}`}
                   >
-                    <div className={`text-sm font-semibold ${targetLevel === lvl ? 'text-indigo-700' : 'text-slate-800'}`}>
+                    <div className={`text-sm font-semibold ${targetLevel === lvl ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-100'}`}>
                       Target {lvl}
                     </div>
                     <div className="text-xs text-slate-400">
@@ -200,7 +200,7 @@ export default function Onboarding() {
 
           {step === 3 && (
             <>
-              <h2 className="text-xl font-bold text-slate-800 mb-1">How much time per day?</h2>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-1">How much time per day?</h2>
               <p className="text-sm text-slate-400 mb-5">Short, focused sessions beat long, unfocused ones.</p>
               <div className="space-y-2.5">
                 {([
@@ -212,9 +212,9 @@ export default function Onboarding() {
                     key={opt.v}
                     onClick={() => setDailyTime(opt.v)}
                     className={`w-full text-left px-4 py-3 rounded-2xl border-2 transition-all
-                      ${dailyTime === opt.v ? 'border-indigo-500 bg-indigo-50' : 'border-slate-100 hover:border-indigo-200'}`}
+                      ${dailyTime === opt.v ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/40' : 'border-slate-100 dark:border-slate-600 hover:border-indigo-200 dark:hover:border-indigo-500'}`}
                   >
-                    <div className={`text-sm font-semibold ${dailyTime === opt.v ? 'text-indigo-700' : 'text-slate-800'}`}>
+                    <div className={`text-sm font-semibold ${dailyTime === opt.v ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-100'}`}>
                       {opt.label}
                     </div>
                     <div className="text-xs text-slate-400">{opt.desc}</div>
@@ -236,7 +236,7 @@ export default function Onboarding() {
           {step > 0 && (
             <button
               onClick={() => setStep((step - 1) as Step)}
-              className="w-full mt-2 py-2 rounded-xl text-slate-400 text-xs hover:text-slate-600"
+              className="w-full mt-2 py-2 rounded-xl text-slate-400 text-xs hover:text-slate-600 dark:hover:text-slate-300"
             >
               Back
             </button>

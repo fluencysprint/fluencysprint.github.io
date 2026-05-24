@@ -164,10 +164,10 @@ export default function Exam() {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <div className="text-sm font-medium text-slate-500">Exam — {currentIndex + 1}/{queue.length}</div>
-          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-indigo-100 text-indigo-700">{exercise.cefrLevel}</span>
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400">Exam — {currentIndex + 1}/{queue.length}</div>
+          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">{exercise.cefrLevel}</span>
         </div>
-        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
           <div className="h-full bg-indigo-500 rounded-full transition-all" style={{ width: `${(currentIndex / queue.length) * 100}%` }} />
         </div>
         <ExerciseRenderer
@@ -187,32 +187,32 @@ export default function Exam() {
     return (
       <div className="space-y-6" data-testid="exam-results">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">{config.title} — results</h1>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">{config.title} — results</h1>
           <p className="text-slate-400 text-sm mt-1">
             Exam score reflects this attempt. New proficiency evidence is tracked separately.
           </p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 text-center">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-4 text-center">
             <div className="text-2xl font-bold text-indigo-600">{acc}%</div>
             <div className="text-xs text-slate-400 mt-1">Exam score</div>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 text-center">
-            <div className="text-2xl font-bold text-slate-800">{correct}/{attempted}</div>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-4 text-center">
+            <div className="text-2xl font-bold text-slate-800 dark:text-white">{correct}/{attempted}</div>
             <div className="text-xs text-slate-400 mt-1">Correct</div>
           </div>
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 text-center" data-testid="exam-new-evidence">
             <div className="text-2xl font-bold text-emerald-600">{newEvidence}</div>
             <div className="text-xs text-slate-400 mt-1">New unseen evidence</div>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 text-center">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-4 text-center">
             <div className="text-2xl font-bold text-amber-600">{repeatedAnswered}</div>
             <div className="text-xs text-slate-400 mt-1">Repeated items</div>
           </div>
         </div>
 
         {memorisedRisk && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-900">
+          <div className="bg-amber-50 dark:bg-amber-900/40 border border-amber-200 dark:border-amber-700 rounded-2xl p-4 text-sm text-amber-900 dark:text-amber-100">
             This improves review performance, but does not add much new level evidence — most
             items were repeats. Try a fresh drill for stronger readiness signal.
           </div>
@@ -231,14 +231,14 @@ export default function Exam() {
   return (
     <div className="space-y-6 pb-10">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Long readiness check</h1>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Long readiness check</h1>
         <p className="text-slate-400 text-sm mt-1">
           Unseen-first sweep across CEFR levels — unofficial practice. Repeated questions count
           as practice, not new proficiency evidence.
         </p>
       </div>
       {warnings.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-xs text-amber-900 space-y-1">
+        <div className="bg-amber-50 dark:bg-amber-900/40 border border-amber-200 dark:border-amber-700 rounded-2xl p-3 text-xs text-amber-900 dark:text-amber-100 space-y-1">
           {warnings.map((w, i) => <div key={i}>⚠ {w}</div>)}
         </div>
       )}
@@ -247,10 +247,10 @@ export default function Exam() {
           <button
             key={c.id}
             onClick={() => startExam(c)}
-            className="w-full text-left bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:border-indigo-300"
+            className="w-full text-left bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-5 hover:border-indigo-300 dark:hover:border-indigo-500"
           >
-            <div className="text-sm font-bold text-slate-800">{c.title}</div>
-            <div className="text-xs text-slate-500 mt-1">{c.description}</div>
+            <div className="text-sm font-bold text-slate-800 dark:text-white">{c.title}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{c.description}</div>
             <div className="text-xs text-slate-400 mt-2">{c.itemCount} items</div>
           </button>
         ))}
