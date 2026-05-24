@@ -481,7 +481,7 @@ const a2extra: Exercise[] = [
   {
     id: 'es-a2-44', type: 'multipleChoice', skill: 'grammar', cefrLevel: 'A2',
     prompt: '¿_____ has visto a Juan últimamente?',
-    choices: ['Has', 'Habías', 'Habías', 'Hiciste'],
+    choices: ['Has', 'Habías', 'Habrás', 'Hiciste'],
     correctAnswer: 'Has',
     explanation: '"¿Has visto…?" — pretérito perfecto para preguntar sobre experiencia reciente.',
     mistakeCategories: ['tense_choice'], tags: ['present perfect', 'recently'],
@@ -688,7 +688,7 @@ const b1extra: Exercise[] = [
   {
     id: 'es-b1-36', type: 'multipleChoice', skill: 'grammar', cefrLevel: 'B1',
     prompt: 'Te _____ que estuvieras más atento en clase.',
-    choices: ['recomendaría', 'recomendé', 'recomendaré', 'recomendaría'],
+    choices: ['recomendaría', 'recomendé', 'recomendaré', 'recomendaba'],
     correctAnswer: 'recomendaría',
     explanation: 'Consejo con condicional simple: te recomendaría que + imperfecto de subjuntivo.',
     mistakeCategories: ['tense_choice'], tags: ['conditional', 'advice'],
@@ -697,7 +697,7 @@ const b1extra: Exercise[] = [
   {
     id: 'es-b1-37', type: 'multipleChoice', skill: 'grammar', cefrLevel: 'B1',
     prompt: 'La nueva ley prohíbe que las empresas _____ datos personales sin consentimiento.',
-    choices: ['compartan', 'comparten', 'compartirán', 'comparten'],
+    choices: ['compartan', 'comparten', 'compartirán', 'compartieran'],
     correctAnswer: 'compartan',
     explanation: '"Prohibir que + subjuntivo" — el verbo de prohibición desencadena subjuntivo.',
     mistakeCategories: ['subjunctive'], tags: ['subjunctive', 'prohibir'],
@@ -736,7 +736,7 @@ const b2extra: Exercise[] = [
   {
     id: 'es-b2-21', type: 'multipleChoice', skill: 'grammar', cefrLevel: 'B2',
     prompt: 'Si hubiera estudiado más, _____ el examen.',
-    choices: ['habría aprobado', 'aprobaría', 'habría aprobado', 'había aprobado'],
+    choices: ['habría aprobado', 'aprobaría', 'hubiera aprobado', 'había aprobado'],
     correctAnswer: 'habría aprobado',
     explanation: 'Condicional irreal de pasado: si + pluscuamperfecto subjuntivo, condicional compuesto.',
     mistakeCategories: ['tense_choice', 'subjunctive'], tags: ['conditionals', 'third'],
@@ -845,7 +845,7 @@ const c1extra: Exercise[] = [
   {
     id: 'es-c1-07', type: 'multipleChoice', skill: 'grammar', cefrLevel: 'C1',
     prompt: 'De haber sabido la verdad, _____ otra decisión.',
-    choices: ['habría tomado', 'tomaría', 'hubiera tomado', 'habría tomado'],
+    choices: ['habría tomado', 'tomaría', 'hubiera tomado', 'habrá tomado'],
     correctAnswer: 'habría tomado',
     explanation: 'Condicional irreal de pasado con inversión: "De haber sabido" = "Si hubiera sabido". Apódosis: condicional compuesto.',
     mistakeCategories: ['tense_choice', 'subjunctive'], tags: ['conditionals', 'inversion'],

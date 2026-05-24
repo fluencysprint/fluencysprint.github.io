@@ -419,10 +419,10 @@ export const englishCalibratedExercises2: Exercise[] = [
     ...base, id: 'en-a2-d16', skill: 'grammar', cefrLevel: 'A2',
     subskill: 'was_were', construct: 'past simple of be',
     itemFamilyId: 'en-fam-was-were',
-    prompt: 'My parents _____ at the concert.',
+    prompt: 'My parents _____ at the concert last night.',
     choices: ['were', 'was', 'are', 'been'],
     correctAnswer: 'were',
-    explanation: 'Plural subject (parents) → were.',
+    explanation: 'Past time marker "last night" → past tense. Plural subject (parents) → were.',
     mistakeCategories: ['tense_aspect'], tags: ['past'], estimatedSeconds: 10, difficulty: 1,
   },
   {
@@ -709,7 +709,7 @@ export const englishCalibratedExercises2: Exercise[] = [
     prompt: 'We will cancel the trip _____ it rains.',
     choices: ['if', 'unless', 'when', 'in case'],
     correctAnswer: 'if',
-    explanation: '"Unless" = if not; "if" fits here because rain → cancel.',
+    explanation: '"If it rains, we cancel" — rain is the condition for cancelling. "Unless" = "if not", which would mean the opposite (cancel when dry).',
     mistakeCategories: ['connector_misuse'], tags: ['conditionals'], estimatedSeconds: 16, difficulty: 3,
   },
   {
