@@ -19,6 +19,8 @@ export default function Review() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [reviewedCount, setReviewedCount] = useState(0);
   const [allMistakes, setAllMistakes] = useState<MistakeRecord[]>([]);
+  // Stable seed for choice order within this review session.
+  const [sessionStartedAt] = useState(() => new Date().toISOString());
 
   useEffect(() => {
     setAllMistakes(getMistakes());
@@ -125,6 +127,7 @@ export default function Review() {
             else setCurrentIndex(i => i + 1);
           }}
           showTimer
+          choiceSeed={sessionStartedAt + record.exerciseId}
         />
       </div>
     );

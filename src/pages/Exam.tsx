@@ -59,6 +59,7 @@ export default function Exam() {
   const [attempted, setAttempted] = useState(0);
   const [newEvidence, setNewEvidence] = useState(0);
   const [repeatedAnswered, setRepeatedAnswered] = useState(0);
+  const [sessionStartedAt, setSessionStartedAt] = useState('');
   const startRef = useRef<number>(Date.now());
 
   function startExam(c: ExamConfig) {
@@ -88,6 +89,7 @@ export default function Exam() {
     setNewEvidence(0); setRepeatedAnswered(0);
     markExercisesSeen(selection.queue.map(e => e.id));
     startRef.current = Date.now();
+    setSessionStartedAt(new Date().toISOString());
     setPhase('running');
   }
 
@@ -168,7 +170,13 @@ export default function Exam() {
         <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
           <div className="h-full bg-indigo-500 rounded-full transition-all" style={{ width: `${(currentIndex / queue.length) * 100}%` }} />
         </div>
-        <ExerciseRenderer exercise={exercise} onAnswer={handleAnswer} onSkip={handleSkip} showTimer />
+        <ExerciseRenderer
+          exercise={exercise}
+          onAnswer={handleAnswer}
+          onSkip={handleSkip}
+          showTimer
+          choiceSeed={sessionStartedAt ? sessionStartedAt + exercise.id : undefined}
+        />
       </div>
     );
   }

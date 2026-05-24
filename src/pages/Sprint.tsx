@@ -64,6 +64,7 @@ export default function Sprint() {
   const [mistakesAdded, setMistakesAdded] = useState<string[]>([]);
   const [skillsWorked, setSkillsWorked] = useState<Set<Skill>>(new Set());
   const [resumeOffer, setResumeOffer] = useState<ResumableSprintState | null>(null);
+  const [sessionStartedAt, setSessionStartedAt] = useState('');
   const startRef = useRef<number>(Date.now());
   const settings = getSettings();
   const progress = getProgress();
@@ -79,10 +80,12 @@ export default function Sprint() {
   function startSprint() {
     if (!profile) return;
     const q = buildSprintQueue(durationMins);
+    const startedAt = new Date().toISOString();
     setQueue(q);
     setCurrentIndex(0); setCorrect(0); setAttempted(0);
     setMistakesAdded([]); setSkillsWorked(new Set());
     startRef.current = Date.now();
+    setSessionStartedAt(startedAt);
     markExercisesSeen(q.map(e => e.id));
     setPhase('running');
     saveResumableSprint({
@@ -91,7 +94,7 @@ export default function Sprint() {
       currentIndex: 0, correct: 0, attempted: 0,
       mistakesAdded: [], skillsWorked: [],
       durationMins,
-      startedAt: new Date().toISOString(),
+      startedAt,
       lastSavedAt: new Date().toISOString(),
     });
   }
@@ -108,6 +111,7 @@ export default function Sprint() {
     setMistakesAdded(state.mistakesAdded);
     setSkillsWorked(new Set(state.skillsWorked));
     setDurationMins(state.durationMins);
+    setSessionStartedAt(state.startedAt);
     startRef.current = Date.now();
     setResumeOffer(null);
     setPhase('running');
@@ -294,6 +298,7 @@ export default function Sprint() {
         <ExerciseRenderer
           exercise={exercise}
           onAnswer={handleAnswer}
+          choiceSeed={sessionStartedAt ? sessionStartedAt + exercise.id : undefined}
           onSkip={() => {
             recordEvidence({
               exercise,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import type { Exercise } from '../types';
-import { checkAnswer } from '../lib/utils';
+import { checkAnswer, seededShuffle } from '../lib/utils';
 import { getActiveLanguagePack } from '../lib/activeLanguage';
 import LanguageInput from './LanguageInput';
 import WordCounter from './WordCounter';
@@ -21,6 +21,12 @@ interface Props {
   }) => void;
   onSkip?: () => void;
   showTimer?: boolean;
+  /**
+   * Stable seed for this attempt's choice display order.
+   * Build as: sessionStartedAt + exercise.id
+   * Same seed → same order (reload-safe). Omit to keep original order.
+   */
+  choiceSeed?: string;
 }
 
 const OBJECTIVE_TYPES = new Set([
@@ -46,7 +52,7 @@ function inferTaskType(exercise: Exercise) {
   return 'general';
 }
 
-export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer = true }: Props) {
+export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer = true, choiceSeed }: Props) {
   const [selected, setSelected] = useState<string>('');
   const [textInput, setTextInput] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -57,6 +63,13 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
   const startTimeRef = useRef<number>(Date.now());
 
   const settings = getSettings();
+
+  // Stable shuffled order for this attempt. Never mutates exercise.choices.
+  const displayChoices = useMemo(() => {
+    if (!exercise.choices || exercise.choices.length === 0) return [];
+    if (!choiceSeed) return exercise.choices;
+    return seededShuffle(exercise.choices, choiceSeed);
+  }, [exercise.choices, choiceSeed]);
 
   const isObjective = OBJECTIVE_TYPES.has(exercise.type);
   const isWriting = WRITING_TYPES.has(exercise.type);
@@ -246,7 +259,7 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
       {/* Multiple choice */}
       {isMultipleChoice && !submitted && (
         <div className="space-y-2" role="radiogroup" aria-label="Answer choices">
-          {exercise.choices!.map(choice => (
+          {displayChoices.map(choice => (
             <button
               key={choice}
               type="button"
@@ -360,7 +373,7 @@ export default function ExerciseRenderer({ exercise, onAnswer, onSkip, showTimer
 
           {isMultipleChoice && (
             <div className="space-y-1.5 mt-3">
-              {exercise.choices!.map(choice => {
+              {displayChoices.map(choice => {
                 const isCorrect = choice === exercise.correctAnswer;
                 const wasSelected = choice === selected;
                 return (

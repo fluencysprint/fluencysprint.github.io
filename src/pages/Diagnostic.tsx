@@ -28,6 +28,7 @@ export default function Diagnostic() {
   const [answers, setAnswers] = useState<DiagnosticAnswer[]>([]);
   const startTimeRef = useRef<number>(Date.now());
   const [resumeOffer, setResumeOffer] = useState<ResumableDiagnosticState | null>(null);
+  const [sessionStartedAt, setSessionStartedAt] = useState('');
 
   // On mount, check for a resumable diagnostic in this profile.
   useEffect(() => {
@@ -50,17 +51,19 @@ export default function Diagnostic() {
       selfEstimatedLevel: profile.selfEstimatedLevel,
       includeWriting: includeWritingArg,
     });
+    const startedAt = new Date().toISOString();
     setDiagnosticItems(queue);
     setCurrentIndex(0);
     setAnswers([]);
     startTimeRef.current = Date.now();
+    setSessionStartedAt(startedAt);
     setPhase('running');
     saveResumableDiagnostic({
       language: profile.targetLanguage,
       itemIds: queue.map(q => q.id),
       currentIndex: 0,
       answers: [],
-      startedAt: new Date().toISOString(),
+      startedAt,
       lastSavedAt: new Date().toISOString(),
     });
   }
@@ -77,6 +80,7 @@ export default function Diagnostic() {
     setDiagnosticItems(queue);
     setCurrentIndex(Math.min(state.currentIndex, queue.length));
     setAnswers(state.answers);
+    setSessionStartedAt(state.startedAt);
     startTimeRef.current = Date.now() - (state.activeSeconds ?? 0) * 1000;
     setResumeOffer(null);
     setPhase('running');
@@ -380,6 +384,7 @@ export default function Diagnostic() {
           onAnswer={handleAnswer}
           onSkip={handleSkipItem}
           showTimer
+          choiceSeed={sessionStartedAt ? sessionStartedAt + exercise.id : undefined}
         />
       </div>
     </div>
