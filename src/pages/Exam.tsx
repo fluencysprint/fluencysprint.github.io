@@ -201,7 +201,7 @@ export default function Exam() {
             <div className="text-2xl font-bold text-slate-800 dark:text-white">{correct}/{attempted}</div>
             <div className="text-xs text-slate-400 mt-1">Correct</div>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 text-center" data-testid="exam-new-evidence">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-4 text-center" data-testid="exam-new-evidence">
             <div className="text-2xl font-bold text-emerald-600">{newEvidence}</div>
             <div className="text-xs text-slate-400 mt-1">New unseen evidence</div>
           </div>

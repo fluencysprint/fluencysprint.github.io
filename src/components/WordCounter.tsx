@@ -9,10 +9,10 @@ interface Props {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  too_short: 'text-amber-600 bg-amber-50 border-amber-200',
-  in_range: 'text-emerald-600 bg-emerald-50 border-emerald-200',
-  too_long: 'text-red-600 bg-red-50 border-red-200',
-  unknown: 'text-slate-500 bg-slate-50 border-slate-200',
+  too_short: 'text-amber-600 bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:text-amber-200 dark:border-amber-700/50',
+  in_range: 'text-emerald-600 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700/50',
+  too_long: 'text-red-600 bg-red-50 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-700/50',
+  unknown: 'text-slate-500 bg-slate-50 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
 };
 
 const STATUS_LABELS: Record<string, string> = {

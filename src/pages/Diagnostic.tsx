@@ -289,7 +289,7 @@ export default function Diagnostic() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 flex items-center justify-center p-4">
         <div className="w-full max-w-lg">
-          <div className="bg-white rounded-3xl shadow-2xl p-8">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8">
             <div className="text-center mb-6">
               <div className="text-4xl mb-3">🎯</div>
               <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">
@@ -341,7 +341,7 @@ export default function Diagnostic() {
   if (phase === 'done') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl p-8 text-center max-w-sm w-full">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 text-center max-w-sm w-full">
           <div className="text-5xl mb-4">📊</div>
           <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Diagnostic complete!</h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Showing your placement report…</p>

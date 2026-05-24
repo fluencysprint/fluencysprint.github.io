@@ -28,7 +28,7 @@ export default function LevelPath({ currentLevel, targetLevel }: Props) {
                     ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-200'
                     : isPast
                     ? 'bg-emerald-500 border-emerald-500 text-white'
-                    : 'bg-white border-slate-200 text-slate-400'
+                    : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500'
                   }`}
                 aria-label={`Level ${level}${isActive ? ' (current)' : ''}${isTarget ? ' (target)' : ''}`}
               >
@@ -42,7 +42,7 @@ export default function LevelPath({ currentLevel, targetLevel }: Props) {
               )}
             </div>
             {i < CEFR_ORDER.length - 1 && (
-              <div className={`flex-1 h-0.5 ${i < currentIndex ? 'bg-emerald-400' : 'bg-slate-200'}`} />
+              <div className={`flex-1 h-0.5 ${i < currentIndex ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-700'}`} />
             )}
           </React.Fragment>
         );

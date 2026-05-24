@@ -7,14 +7,16 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* CSS variables for components that rely on inline styles (e.g. WeaknessHeatmap) */
+/* CSS variables for components that rely on inline styles (e.g. WeaknessHeatmap, ProgressRing) */
 :root {
   --heat-empty-bg: #f1f5f9;
   --heat-empty-text: #94a3b8;
+  --ring-track: #e2e8f0;
 }
 .dark {
   --heat-empty-bg: #1e293b;
   --heat-empty-text: #64748b;
+  --ring-track: #334155;
   color-scheme: dark;
 }
 

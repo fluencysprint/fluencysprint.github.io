@@ -19,11 +19,11 @@ const LEVEL_COLORS: Record<CEFRLevel, string> = {
 };
 
 const STATUS_STYLES: Record<LevelEvidenceStatus, string> = {
-  unknown: 'text-slate-500 bg-slate-100',
-  not_yet: 'text-red-700 bg-red-50',
-  emerging: 'text-amber-700 bg-amber-50',
-  developing: 'text-indigo-700 bg-indigo-50',
-  strong: 'text-emerald-700 bg-emerald-50',
+  unknown: 'text-slate-500 bg-slate-100 dark:bg-slate-700 dark:text-slate-400',
+  not_yet: 'text-red-700 bg-red-50 dark:bg-red-950/40 dark:text-red-300',
+  emerging: 'text-amber-700 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-200',
+  developing: 'text-indigo-700 bg-indigo-50 dark:bg-indigo-900/40 dark:text-indigo-300',
+  strong: 'text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-300',
 };
 
 export default function ReadinessCard({ level, readiness, status, attempted, isCurrent }: Props) {
@@ -32,7 +32,7 @@ export default function ReadinessCard({ level, readiness, status, attempted, isC
 
   return (
     <div
-      className={`bg-white rounded-2xl border p-3 ${isCurrent ? 'border-indigo-300 shadow-md' : 'border-slate-100 shadow-sm'}`}
+      className={`bg-white dark:bg-slate-800 rounded-2xl border p-3 ${isCurrent ? 'border-indigo-300 dark:border-indigo-500 shadow-md' : 'border-slate-100 dark:border-slate-700 shadow-sm'}`}
       data-testid={`readiness-${level}`}
     >
       <div className="flex items-center justify-between mb-2">
@@ -42,7 +42,7 @@ export default function ReadinessCard({ level, readiness, status, attempted, isC
         >
           {level}
         </span>
-        <div className="text-sm font-bold text-slate-700 tabular-nums">{ringPct}%</div>
+        <div className="text-sm font-bold text-slate-700 dark:text-slate-200 tabular-nums">{ringPct}%</div>
       </div>
       <div className={`text-[11px] inline-block px-2 py-0.5 rounded-full ${STATUS_STYLES[status]} font-medium`}>
         {LEVEL_STATUS_LABELS[status]}

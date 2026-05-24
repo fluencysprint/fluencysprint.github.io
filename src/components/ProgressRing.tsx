@@ -15,7 +15,7 @@ export default function ProgressRing({
   size = 80,
   stroke = 7,
   color = '#6366f1',
-  trackColor = '#e2e8f0',
+  trackColor = 'var(--ring-track)',
   label,
   sublabel,
 }: Props) {
@@ -27,7 +27,7 @@ export default function ProgressRing({
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="progress-ring -rotate-90">
-        <circle cx={cx} cy={cx} r={r} fill="none" stroke={trackColor} strokeWidth={stroke} />
+        <circle cx={cx} cy={cx} r={r} fill="none" style={{ stroke: trackColor }} strokeWidth={stroke} />
         <circle
           cx={cx} cy={cx} r={r}
           fill="none"
@@ -40,8 +40,8 @@ export default function ProgressRing({
       </svg>
       {(label || sublabel) && (
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          {label && <span className="text-sm font-bold leading-none">{label}</span>}
-          {sublabel && <span className="text-xs text-slate-500 mt-0.5">{sublabel}</span>}
+          {label && <span className="text-sm font-bold leading-none text-slate-800 dark:text-white">{label}</span>}
+          {sublabel && <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{sublabel}</span>}
         </div>
       )}
     </div>
