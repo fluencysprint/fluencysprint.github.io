@@ -7,10 +7,11 @@ import { englishReadingTexts2 } from './readingTexts2';
 import { englishWritingPrompts } from './writingPrompts';
 import { englishWritingPrompts2 } from './writingPrompts2';
 import { englishCalibratedExercises, englishCalibratedReadings, englishCalibratedWritingPrompts } from './calibrated';
+import { englishCalibratedExercises2, englishCalibratedReadings2, englishCalibratedWritingPrompts2 } from './calibrated2';
 
 export const englishPack: LanguagePack = {
   metadata: englishMetadata,
-  exercises: [...englishExercises, ...englishExercises2, ...englishCalibratedExercises],
-  readingTexts: [...englishReadingTexts, ...englishReadingTexts2, ...englishCalibratedReadings],
-  writingPrompts: [...englishWritingPrompts, ...englishWritingPrompts2, ...englishCalibratedWritingPrompts],
+  exercises: [...englishExercises, ...englishExercises2, ...englishCalibratedExercises, ...englishCalibratedExercises2],
+  readingTexts: [...englishReadingTexts, ...englishReadingTexts2, ...englishCalibratedReadings, ...englishCalibratedReadings2],
+  writingPrompts: [...englishWritingPrompts, ...englishWritingPrompts2, ...englishCalibratedWritingPrompts, ...englishCalibratedWritingPrompts2],
 };

@@ -6,7 +6,7 @@ import { getProficiency } from '../lib/proficiency';
 import LevelReadinessCard from '../components/LevelReadinessCard';
 import ProgressRing from '../components/ProgressRing';
 import type { Skill, MistakeCategory } from '../types';
-import { SKILL_LABELS, COMING_SOON_SKILLS } from '../types';
+import { SKILL_LABELS, COMING_SOON_SKILLS, MISTAKE_LABELS } from '../types';
 
 export default function Skills() {
   const navigate = useNavigate();
@@ -62,13 +62,22 @@ export default function Skills() {
         {proficiency.readinessBySkill.map(s => {
           const notEnough = s.proficiency === null;
           const ringColor = (s.proficiency ?? 0) >= 70 ? '#10b981' : (s.proficiency ?? 0) >= 50 ? '#6366f1' : '#f59e0b';
+          const topCat = skillTopMistake[s.skill];
+          const topLabel = topCat ? MISTAKE_LABELS[topCat] : null;
+          const onlyReview = s.unseenItems === 0 && s.repeatedItems > 0;
+          const weakEvidence = s.confidence === 'insufficient' || s.confidence === 'very_low';
+          const mistakePrefix = onlyReview
+            ? 'Needs review:'
+            : weakEvidence
+            ? 'Early signal:'
+            : 'Main issue:';
           return (
             <div key={s.skill} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col gap-3" data-testid={`skill-${s.skill}`}>
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-sm font-semibold text-slate-800">{SKILL_LABELS[s.skill]}</div>
                   {notEnough ? (
-                    <div className="text-xs text-slate-400 mt-0.5">Not enough data</div>
+                    <div className="text-xs text-slate-400 mt-0.5">Not enough data yet</div>
                   ) : (
                     <div className="text-xs text-slate-400 mt-0.5">Proficiency {s.proficiency}/100</div>
                   )}
@@ -84,10 +93,13 @@ export default function Skills() {
                 {s.unseenItems} unseen, {s.repeatedItems} repeated
                 {skillMistakeCounts[s.skill] ? ` · ${skillMistakeCounts[s.skill]} due` : ''}
               </div>
-              {skillTopMistake[s.skill] && (
-                <div className="text-xs text-slate-400 bg-slate-50 rounded-lg px-2 py-1.5">
-                  Top error: {skillTopMistake[s.skill]}
+              {topLabel && (
+                <div className="text-xs text-slate-500 bg-slate-50 rounded-lg px-2 py-1.5">
+                  {mistakePrefix} {topLabel}
                 </div>
+              )}
+              {!topLabel && notEnough && (
+                <div className="text-xs text-slate-400 italic px-1">Not enough data yet</div>
               )}
               <button
                 onClick={() => navigate('/sprint')}
