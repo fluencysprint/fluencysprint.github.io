@@ -200,3 +200,108 @@ describe('test 12 — non-objective types are ignored by audit', () => {
     expect(auditExercise(wp)).toEqual([]);
   });
 });
+
+// ─── Test 13: Bad Spanish superlative prompt is gone ─────────────────────────
+
+describe('test 13 — broken Spanish superlative item is fixed', () => {
+  it('no item has the bad prompt with "Éste" or "el más" before a noun', () => {
+    const allSpanish = [
+      ...spanishA1Exercises, ...spanishA2Exercises, ...spanishExtraExercises,
+      ...spanishCalibratedExercises, ...spanishCalibratedExercises2,
+    ];
+    const badPrompt = allSpanish.find(e =>
+      /[ÉéEe]ste es _+\s*plato|el más plato/i.test(
+        (e.prompt ?? '').replace(/_{2,}/, e.correctAnswer ?? ''),
+      )
+    );
+    expect(badPrompt).toBeUndefined();
+  });
+});
+
+// ─── Test 14: No Spanish item accepts "el más" followed by a noun ─────────────
+
+describe('test 14 — no Spanish item creates "article + más + noun + adjective" order', () => {
+  it('inserting the correct answer never produces the wrong superlative order', () => {
+    const allSpanish = [
+      ...spanishA1Exercises, ...spanishA2Exercises, ...spanishExtraExercises,
+      ...spanishCalibratedExercises, ...spanishCalibratedExercises2,
+    ].filter(e => e.correctAnswer && /_{2,}/.test(e.prompt ?? ''));
+
+    const offenders = allSpanish.filter(e => {
+      const full = (e.prompt ?? '').replace(/_{2,}/, e.correctAnswer!).toLowerCase();
+      return /\b(el|la|los|las)\s+más\s+[a-záéíóúüñ]+\s+[a-záéíóúüñ]+\s+(del|de la|de los|de las)\b/.test(full);
+    });
+    expect(offenders.map(e => e.id)).toEqual([]);
+  });
+});
+
+// ─── Test 15: Spanish superlative items produce valid completed sentences ─────
+
+describe('test 15 — Spanish superlative items pass the new audit check', () => {
+  it('no Spanish item flagged for spanish_superlative_order error', () => {
+    const allSpanish = [
+      ...spanishA1Exercises, ...spanishA2Exercises, ...spanishExtraExercises,
+      ...spanishCalibratedExercises, ...spanishCalibratedExercises2,
+    ];
+    const errors = auditExerciseBank(allSpanish).filter(
+      r => r.severity === 'error' && r.type === 'spanish_superlative_order',
+    );
+    expect(errors.map(r => `${r.id}: ${r.message}`)).toEqual([]);
+  });
+});
+
+// ─── Test 16: auditExercise flags wrong superlative order ─────────────────────
+
+describe('test 16 — auditExercise detects wrong Spanish superlative word order', () => {
+  it('flags "el más plato delicioso del restaurante" as spanish_superlative_order error', () => {
+    const ex = makeEx({
+      id: 'bad-superlative',
+      prompt: 'Éste es _____ plato delicioso del restaurante.',
+      choices: ['el más', 'muy', 'el mucho', 'lo más'],
+      correctAnswer: 'el más',
+      explanation: 'Superlativo relativo.',
+    });
+    const issues = auditExercise(ex);
+    expect(issues.some(i => i.type === 'spanish_superlative_order')).toBe(true);
+  });
+
+  it('does not flag correct superlative order "el plato más delicioso del restaurante"', () => {
+    const ex = makeEx({
+      id: 'good-superlative',
+      prompt: 'Este es el plato _____ delicioso del restaurante.',
+      choices: ['más', 'muy', 'mucho', 'tan'],
+      correctAnswer: 'más',
+      explanation: 'With a noun phrase, Spanish places más before the adjective.',
+    });
+    const issues = auditExercise(ex);
+    expect(issues.some(i => i.type === 'spanish_superlative_order')).toBe(false);
+  });
+});
+
+// ─── Test 17: Every examEligible item has a non-empty explanation ─────────────
+
+describe('test 17 — every examEligible item has a non-empty explanation', () => {
+  it('all items explicitly marked examEligible: true have an explanation', () => {
+    const allItems = [
+      ...spanishA1Exercises, ...spanishA2Exercises, ...spanishExtraExercises,
+      ...spanishCalibratedExercises, ...spanishCalibratedExercises2,
+      ...englishExercises, ...englishExercises2,
+      ...englishCalibratedExercises, ...englishCalibratedExercises2,
+    ].filter(e => e.examEligible === true);
+
+    const missing = allItems.filter(e => !e.explanation || e.explanation.trim() === '');
+    expect(missing.map(e => e.id)).toEqual([]);
+  });
+});
+
+// ─── Test 18: Multiple-choice shuffle still works after item fix ───────────────
+
+describe('test 18 — es-a2-d25 new choices are valid for shuffling', () => {
+  it('fixed item has 4 unique choices with the correct answer present', () => {
+    const item = spanishCalibratedExercises2.find(e => e.id === 'es-a2-d25');
+    expect(item).toBeDefined();
+    expect(item!.choices).toHaveLength(4);
+    expect(new Set(item!.choices!).size).toBe(4);
+    expect(item!.choices!).toContain(item!.correctAnswer);
+  });
+});

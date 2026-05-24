@@ -11,11 +11,27 @@
 :root {
   --heat-empty-bg: #f1f5f9;
   --heat-empty-text: #94a3b8;
+  --heat-low-bg: #fef3c7;
+  --heat-med-bg: #fcd34d;
+  --heat-high-bg: #f97316;
+  --heat-max-bg: #ef4444;
+  --heat-low-text: #374151;
+  --heat-med-text: #374151;
+  --heat-high-text: #ffffff;
+  --heat-max-text: #ffffff;
   --ring-track: #e2e8f0;
 }
 .dark {
   --heat-empty-bg: #1e293b;
   --heat-empty-text: #64748b;
+  --heat-low-bg: #451a03;
+  --heat-med-bg: #78350f;
+  --heat-high-bg: #9a3412;
+  --heat-max-bg: #991b1b;
+  --heat-low-text: #fde68a;
+  --heat-med-text: #fbbf24;
+  --heat-high-text: #fed7aa;
+  --heat-max-text: #fecaca;
   --ring-track: #334155;
   color-scheme: dark;
 }
@@ -61,4 +77,10 @@ body {
 :focus-visible {
   outline: 2px solid #6366f1;
   outline-offset: 2px;
+}
+
+/* PWA standalone — respect device safe-area notch */
+.mobile-header-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), 0.75rem);
+  padding-bottom: 0.75rem;
 }

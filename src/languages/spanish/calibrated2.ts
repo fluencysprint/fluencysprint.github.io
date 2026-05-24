@@ -509,11 +509,11 @@ export const spanishCalibratedExercises2: Exercise[] = [
     ...base, id: 'es-a2-d25', skill: 'grammar', cefrLevel: 'A2',
     subskill: 'superlatives', construct: 'superlative el/la más',
     itemFamilyId: 'es-fam-superlatives',
-    prompt: 'Éste es _____ plato delicioso del restaurante.',
-    choices: ['el más', 'muy', 'el mucho', 'lo más'],
-    correctAnswer: 'el más',
-    explanation: 'Superlativo relativo: el/la/los/las + más + adjetivo.',
-    mistakeCategories: ['tense_choice'], tags: ['superlatives'], estimatedSeconds: 12, difficulty: 2,
+    prompt: 'Este es el plato _____ delicioso del restaurante.',
+    choices: ['más', 'muy', 'mucho', 'tan'],
+    correctAnswer: 'más',
+    explanation: 'With a noun phrase, Spanish places más before the adjective: el plato más delicioso.',
+    mistakeCategories: ['word_order'], tags: ['superlatives'], estimatedSeconds: 12, difficulty: 2,
   },
 
   // ── B1 (20 items) ─────────────────────────────────────────────────────────

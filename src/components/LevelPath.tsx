@@ -25,7 +25,7 @@ export default function LevelPath({ currentLevel, targetLevel }: Props) {
               <div
                 className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all
                   ${isActive
-                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-200'
+                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900'
                     : isPast
                     ? 'bg-emerald-500 border-emerald-500 text-white'
                     : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500'

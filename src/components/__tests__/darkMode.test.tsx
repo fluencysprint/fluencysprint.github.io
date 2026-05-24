@@ -3,6 +3,8 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import LevelPath from '../LevelPath';
 import WordCounter from '../WordCounter';
+import WeaknessHeatmap from '../WeaknessHeatmap';
+import type { MistakeCategory } from '../../types';
 
 beforeEach(() => {
   document.documentElement.classList.add('dark');
@@ -57,6 +59,52 @@ describe('WordCounter dark mode', () => {
     const badge = screen.getByTestId('word-counter').querySelector('span');
     expect(badge?.className).toContain('dark:bg-red-950/40');
     expect(badge?.className).toContain('dark:text-red-300');
+  });
+});
+
+describe('LevelPath active node dark glow', () => {
+  it('active node does not use hardcoded white-only shadow', () => {
+    render(<LevelPath currentLevel="B1" />);
+    const path = screen.getByTestId('level-path');
+    const activeNode = path.querySelector('[class*="bg-indigo-600"]');
+    expect(activeNode).not.toBeNull();
+    expect(activeNode!.className).toContain('dark:shadow-indigo-900');
+  });
+
+  it('active node has dark shadow variant, not just light', () => {
+    render(<LevelPath currentLevel="A2" />);
+    const path = screen.getByTestId('level-path');
+    const activeNode = path.querySelector('[class*="shadow-indigo-200"]');
+    expect(activeNode).not.toBeNull();
+    expect(activeNode!.className).toContain('dark:shadow-indigo-900');
+    expect(activeNode!.className).not.toMatch(/shadow-white/);
+  });
+});
+
+describe('WeaknessHeatmap dark mode', () => {
+  const cats: MistakeCategory[] = ['subjunctive', 'tense_choice', 'ser_estar', 'por_para'];
+
+  it('inactive tiles use CSS variable for background, not hardcoded white', () => {
+    const { container } = render(
+      <WeaknessHeatmap mistakeCounts={{}} categories={cats} />,
+    );
+    const tiles = container.querySelectorAll('[style*="background"]');
+    for (const tile of tiles) {
+      const bg = (tile as HTMLElement).style.backgroundColor;
+      expect(bg).toContain('var(--heat-');
+    }
+  });
+
+  it('active high-severity tile uses CSS variable for color', () => {
+    const counts: Partial<Record<MistakeCategory, number>> = { subjunctive: 10, tense_choice: 3 };
+    const { container } = render(
+      <WeaknessHeatmap mistakeCounts={counts} categories={cats} />,
+    );
+    const tiles = container.querySelectorAll('[style*="background"]');
+    const hasCssVar = [...tiles].some(t =>
+      (t as HTMLElement).style.backgroundColor.includes('var(--heat-'),
+    );
+    expect(hasCssVar).toBe(true);
   });
 });
 

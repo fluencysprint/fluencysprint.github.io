@@ -11,16 +11,19 @@ interface Props {
 function heatColor(count: number, max: number): string {
   if (max === 0 || count === 0) return 'var(--heat-empty-bg)';
   const ratio = count / max;
-  if (ratio < 0.25) return '#fef3c7';
-  if (ratio < 0.5) return '#fcd34d';
-  if (ratio < 0.75) return '#f97316';
-  return '#ef4444';
+  if (ratio < 0.25) return 'var(--heat-low-bg)';
+  if (ratio < 0.5) return 'var(--heat-med-bg)';
+  if (ratio < 0.75) return 'var(--heat-high-bg)';
+  return 'var(--heat-max-bg)';
 }
 
 function textColor(count: number, max: number): string {
   if (max === 0 || count === 0) return 'var(--heat-empty-text)';
   const ratio = count / max;
-  return ratio >= 0.5 ? '#fff' : '#374151';
+  if (ratio < 0.25) return 'var(--heat-low-text)';
+  if (ratio < 0.5) return 'var(--heat-med-text)';
+  if (ratio < 0.75) return 'var(--heat-high-text)';
+  return 'var(--heat-max-text)';
 }
 
 export default function WeaknessHeatmap({ mistakeCounts, categories }: Props) {

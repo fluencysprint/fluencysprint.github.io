@@ -9,7 +9,8 @@ export type AuditIssueType =
   | 'confused_explanation'
   | 'duplicate_temporal_marker'
   | 'choice_creates_duplicate'
-  | 'ambiguous_tense_context';
+  | 'ambiguous_tense_context'
+  | 'spanish_superlative_order';
 
 export interface AuditResult {
   id: string;
@@ -146,6 +147,20 @@ export function auditExercise(exercise: Exercise): AuditResult[] {
           message: `Choice "${choice}" creates repeated "${dups[0]}": "${full}"`,
         });
       }
+    }
+  }
+
+  // 6b. Spanish superlative word order: "article + más + NOUN + adjective" is wrong
+  // Correct: "article + NOUN + más + adjective"
+  // Pattern: detects "el|la|los|las más <word> <word> del|de la|de los|de las"
+  if (prompt && /_{2,}/.test(prompt) && correctAnswer) {
+    const full = insertAnswer(prompt, correctAnswer).toLowerCase();
+    if (/\b(el|la|los|las)\s+más\s+[a-záéíóúüñ]+\s+[a-záéíóúüñ]+\s+(del|de la|de los|de las)\b/.test(full)) {
+      results.push({
+        id, severity: 'error', type: 'spanish_superlative_order',
+        message: `Wrong superlative word order: "${full}" — correct order is "noun + más + adjective".`,
+        suggestedFix: 'Rewrite as "Es el [noun] _____ [adjective] del..." with correctAnswer "más".',
+      });
     }
   }
 

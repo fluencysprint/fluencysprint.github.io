@@ -38,10 +38,16 @@ export default function Settings() {
   const [saveStatus, setSaveStatusState] = useState<SaveStatus>({ kind: 'idle' });
   const [persistentStorage, setPersistentStorage] = useState<boolean | null>(null);
   const [, forceRerender] = useState(0);
+  const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
 
   useEffect(() => onSaveStatus(setSaveStatusState), []);
   useEffect(() => {
     isPersistentStorageGranted().then(granted => setPersistentStorage(granted));
+  }, []);
+  useEffect(() => {
+    const handler = (e: Event) => { e.preventDefault(); setInstallPrompt(e); };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
   const status = getStorageStatus();
@@ -382,6 +388,28 @@ export default function Settings() {
             {resetAllConfirm ? '⚠ Tap again to wipe everything' : 'Reset all app data'}
           </button>
         </div>
+      </div>
+
+      {/* App install */}
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-5">
+        <div className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wide font-semibold mb-3">App</div>
+        {installPrompt ? (
+          <div>
+            <div className="text-sm font-medium text-slate-800 dark:text-slate-100 mb-1">Add to home screen</div>
+            <div className="text-xs text-slate-400 dark:text-slate-500 mb-3">Install for a full-screen experience without the browser bar.</div>
+            <button
+              onClick={() => { (installPrompt as any).prompt(); setInstallPrompt(null); }}
+              className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
+            >
+              Add to home screen
+            </button>
+          </div>
+        ) : (
+          <div className="text-xs text-slate-500 dark:text-slate-400 space-y-1.5">
+            <p><strong>iOS Safari:</strong> tap the Share button then <em>Add to Home Screen</em>.</p>
+            <p><strong>Android Chrome:</strong> tap the menu then <em>Add to Home screen</em>.</p>
+          </div>
+        )}
       </div>
 
       {/* About */}

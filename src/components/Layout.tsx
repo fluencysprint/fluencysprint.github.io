@@ -93,7 +93,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 px-4 py-3 flex items-center justify-between">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 px-4 mobile-header-safe flex items-center justify-between">
         <div className="min-w-0 flex-1 mr-2">
           <div className="flex items-center gap-2">
             <div className="text-sm font-bold text-slate-800 dark:text-white">Fluency Sprint</div>
